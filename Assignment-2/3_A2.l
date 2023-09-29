@@ -13,20 +13,21 @@ IF          "if"
 INTEGER     "int"
 RETURN      "return"
 VOID        "void"
+WHITESPACE  [ \t\n]
 
 
 /* Definitions of Rules \& Actions */
 %%
-{CHARACTER} {printf("CHARACTER\n");}
-{ELSE}      {printf("Keyword ELSE\n");}
-{FOR}       {printf("Keyword FOR\n");}
-{IF}        {printf("Keyword IF\n");}
-{INTEGER}   {printf("Keyword INT\n");}
-{RETURN}    {printf("Keyword RETURN\n");}
-{VOID}      {printf("Keyword VOID\n");}
+{CHARACTER} {printf("<KEYWORD char>\n");}
+{ELSE}      {printf("<KEYWORD else>\n");}
+{FOR}       {printf("<KEYWORD for>\n");}
+{IF}        {printf("<KEYWORD if>\n");}
+{INTEGER}   {printf("<KEYWORD int>\n");}
+{RETURN}    {printf("<KEYWORD return>\n");}
+{VOID}      {printf("<KEYWORD void>\n");}
+{WHITESPACE}    /*Ignore whitespace*/
 %%
 
-int main() {
-	yylex(); /* Flex Engine */ 
-	return 0;
+int yywrap(){
+    return 1;
 }
