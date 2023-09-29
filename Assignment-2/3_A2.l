@@ -4,30 +4,28 @@
 
 %{
     #include <stdio.h>
-}%
-
-CHAR    "char"
-ELSE    "else"
-FOR     "for"
-IF      "if"
-INT     "int"
-RETURN  "return"
-VOID    "void"
+%}
+/* Regular Expressions */
+CHARACTER   "char"
+ELSE        "else"
+FOR         "for"
+IF          "if"
+INTEGER     "int"
+RETURN      "return"
+VOID        "void"
 
 
 /* Definitions of Rules \& Actions */
 %%
-{CHAR}  {printf("CHAR\n");}
-{ELSE}  {printf("ELSE\n");}
-{FOR}   {printf("FOR\n");}
-{IF}    {printf("IF\n");}
-{INT}   {printf("INT\n");}
-{RETURN}    {printf("RETURN\n");}
-{VOID}  {printf("VOID\n");}
-
+{CHARACTER} {printf("CHARACTER\n");}
+{ELSE}      {printf("Keyword ELSE\n");}
+{FOR}       {printf("Keyword FOR\n");}
+{IF}        {printf("Keyword IF\n");}
+{INTEGER}   {printf("Keyword INT\n");}
+{RETURN}    {printf("Keyword RETURN\n");}
+{VOID}      {printf("Keyword VOID\n");}
 %%
 
-/* C functions */
 int main() {
 	yylex(); /* Flex Engine */ 
 	return 0;
