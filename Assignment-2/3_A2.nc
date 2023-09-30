@@ -1,6 +1,6 @@
 /* Bubble Sort Algorithm in nanoC language.
 This is a test program for the lexer to tokenize.
-Team: julius-stabs-back
+Group 03: julius-stabs-back
 Members: Gautam Ahuja, Nistha Singh
 */
 

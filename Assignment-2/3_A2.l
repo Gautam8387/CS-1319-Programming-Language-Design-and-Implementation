@@ -1,6 +1,5 @@
-/* This is the lexical analysis file for a compiler  */
-/* This will contain Regular Expressions for the tokens */ 
-/* We are using Flex to generate the lexical analyzer */
+/* Group 03: julius-stabs-back */
+/* Gautam Ahuja, Nistha Singh */ 
 
 %{
     
