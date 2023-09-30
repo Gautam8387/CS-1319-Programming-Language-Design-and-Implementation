@@ -22,17 +22,20 @@ SIGN               [+-]
 NONZERO_DIGIT      [1-9]
 DIGIT              [0-9]
 /* integer-constant: 0 or (sign) nonzero-digit  or integer-constant digit (the digit can repeat 0 or more times) */
-INTEGER_CONSTANT   0|({SIGN})?({NONZERO_DIGIT})({DIGIT})*
+INTEGER_CONSTANT   0|({SIGN}?({NONZERO_DIGIT}))({DIGIT})*
 
 /* escape-sequence: any one of the \', \'', \?, \\, \a, \b, \f, \n, \r, \t, \v */
-ESCAPE_SEQUENCE    [\'\"?\\\\a\\b\\f\\n\\r\\t\\v]
+ESCAPE_SEQUENCE    "\'"|"\""|"\?"|"\\a"|"\\b"|"\\f"|"\\n"|"\\r"|"\\t"|"\\v"
 
 /* c-char: escape-sequence or any character except single quote ', backslash \, or new line */
 C_CHAR              ({ESCAPE_SEQUENCE})|([^\'\\\n])
 /* c-char-sequence: c-char | c-char-sequence c-char */
 CHAR_SEQUENCE       {C_CHAR}+
-/* character-constant: 'c-char-sequence' where c-char-sequence = c-char | c-char-sequence c-char */
+/* character-constant: 'c-char-sequence' */
 CHARACTER_CONSTANT  ([\'])({CHAR_SEQUENCE})([\'])
+
+/* CONSTANT: integer-constant or character-constant */
+CONSTANT           ({INTEGER_CONSTANT})|({CHARACTER_CONSTANT})
 
 /* String Literals */
 /* S-Char: escape-sequence or any character except double quote ", backslash \, or new line */
@@ -40,10 +43,10 @@ S_CHAR              ({ESCAPE_SEQUENCE})|([^\"\\\n])
 /* S-Char-Sequence: S-Char | S-Char-Sequence S-Char */
 S_CHAR_SEQUENCE     {S_CHAR}+
 /* String-Literal: S-Char-Sequence_opt. Terminated by null = '\0' */
-STRING_LITERAL      "\""({S_CHAR_SEQUENCE})"\""
+STRING_LITERAL      ([\"])({S_CHAR_SEQUENCE})([\"])
 
 /* Punctuators: one of [ ] ( ) { } -> & * + - / % ! ? < > <= >= == != && || = : ; ,*/
-PUNCTUATORS     [\[\]\(\)\{\}\->&\*\+\-\/\%\!\?\<\>\=:\;\,]
+PUNCTUATORS     "["|"]"|"("|")"|"{"|"}"|"->"|"&"|"*"|"+"|"-"|"/"|"%"|"!"|"?"|"<"|">"|"<="|">="|"=="|"!="|"&&"|"||"|"="|":"|";"|","
 
 /* Comments */
 /* Multi-line comments :Start \/\*, End \*\/, In betwen everything is ignored */
@@ -67,14 +70,12 @@ WHITESPACE  [ \t\n]
 {RETURN}        {printf("<KEYWORD, return>\n");}
 {VOID}          {printf("<KEYWORD, void>\n");}
 {IDENTIFIER}    {printf("<IDENTIFIER, %s>\n", yytext);}
-{INTEGER_CONSTANT}  {printf("<INTEGER_CONSTANT, %s>\n", yytext);}
-{CHARACTER_CONSTANT}    {printf("<CHARACTER_CONSTANT, %s>\n", yytext);}
+{CONSTANT}  {printf("<CONSTANT, %s>\n", yytext);}
 {STRING_LITERAL}    {printf("<STRING_LITERAL, %s>\n", yytext);}
 {PUNCTUATORS}   {printf("<PUNCTUATOR, %s>\n", yytext);}
 {MULTI_LINE_COMMENT}   {printf("<COMMENT, %s>\n", yytext);}
 {SINGLE_LINE_COMMENT}  {printf("<COMMENT, %s>\n", yytext);}
 {WHITESPACE}    /*Ignore whitespace*/
-.               {}
 %%
 
 int yywrap(){
