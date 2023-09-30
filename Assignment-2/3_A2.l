@@ -75,7 +75,7 @@ WHITESPACE  [ \t\n\r]
 {CONSTANT}  {printf("<CONSTANT, %s>\n", yytext);}
 {STRING_LITERAL}    {printf("<STRING_LITERAL, %s>\n", yytext);}
 {PUNCTUATORS}   {printf("<PUNCTUATOR, %s>\n", yytext);}
-{COMMENT}       {printf("<COMMENT, %s>\n", yytext);}
+{COMMENT}       /*Ignore Comments*/
 {WHITESPACE}    /*Ignore whitespace*/
 .               {printf("<INVALID_TOKEN, %s\n>", yytext); return -1;}
 %%

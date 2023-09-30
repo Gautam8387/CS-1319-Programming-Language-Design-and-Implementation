@@ -25,6 +25,7 @@ int main()
     bubbleSort(n);
     printStr("Sorted array: \n");
     printArray(n);
+    printStr("Is this the real life? Is this just fantasy?\n");
     return 0;
 }
 
