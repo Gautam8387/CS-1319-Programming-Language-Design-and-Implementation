@@ -57,6 +57,7 @@ gcc 3_A2.yy.c 3_A2.c -ll -o 3_A2.out
 
 ============= STRING_CONSTANT & PUNCTUATOR TESTS =================
 ---------- INPUT -----------
+my_string = "This is a \"quoted\" word."
 int main() {
     int x = 2;
     int y = 3;

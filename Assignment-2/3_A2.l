@@ -24,7 +24,7 @@ DIGIT              [0-9]
 INTEGER_CONSTANT   0|({SIGN}?({NONZERO_DIGIT}))({DIGIT})*
 
 /* escape-sequence: any one of the \', \'', \?, \\, \a, \b, \f, \n, \r, \t, \v */
-ESCAPE_SEQUENCE    "\'"|"\""|"\?"|"\\a"|"\\b"|"\\f"|"\\n"|"\\r"|"\\t"|"\\v"
+ESCAPE_SEQUENCE    "\'"|"\""|"\?"|"\\"|"\\a"|"\\b"|"\\f"|"\\n"|"\\r"|"\\t"|"\\v"
 
 /* c-char: escape-sequence or any character except single quote ', backslash \, or new line */
 C_CHAR              ({ESCAPE_SEQUENCE})|([^\'\\\n])
