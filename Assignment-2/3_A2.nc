@@ -66,3 +66,7 @@ void bubbleSort(int n)
             if (arr[j] > arr[j + 1])
                 swap(&arr[j], &arr[j + 1]);
 }
+#include
+/* This is the ending multi-line comment.
+    It will not be read by the lexer as it stops above when it encounters the above invalid token '#'. 
+    The next work to # (include) will also be not read. */

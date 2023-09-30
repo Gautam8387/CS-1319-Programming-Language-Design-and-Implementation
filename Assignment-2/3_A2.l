@@ -60,7 +60,7 @@ SINGLE_LINE_COMMENT    (\/\/)([^\n])*
 COMMENT     ({MULTI_LINE_COMMENT})|({SINGLE_LINE_COMMENT})
 
 /* Ignore Whitespace */
-WHITESPACE  [ \t\n]
+WHITESPACE  [ \t\n\r]
 
 
 /* Definitions of Rules \& Actions */
@@ -78,6 +78,7 @@ WHITESPACE  [ \t\n]
 {PUNCTUATORS}   {printf("<PUNCTUATOR, %s>\n", yytext);}
 {COMMENT}       {printf("<COMMENT, %s>\n", yytext);}
 {WHITESPACE}    /*Ignore whitespace*/
+.               {printf("<INVALID_TOKEN, %s\n>", yytext); return -1;}
 %%
 
 int yywrap(){
