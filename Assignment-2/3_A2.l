@@ -48,13 +48,16 @@ STRING_LITERAL      ([\"])({S_CHAR_SEQUENCE})([\"])
 /* Punctuators: one of [ ] ( ) { } -> & * + - / % ! ? < > <= >= == != && || = : ; ,*/
 PUNCTUATORS     "["|"]"|"("|")"|"{"|"}"|"->"|"&"|"*"|"+"|"-"|"/"|"%"|"!"|"?"|"<"|">"|"<="|">="|"=="|"!="|"&&"|"||"|"="|":"|";"|","
 
-/* Comments */
 /* Multi-line comments :Start \/\*, End \*\/, In betwen everything is ignored */
 /* In between, if there is a * followed by /, then it must be end of comment */
-/* Thus middle sequence is [^\*] not star, or * not followed by / */
+/* If middle sequence is [^\*] not star, it can have any character */
+/* If middle sequence is [\*] a star, it must NOT follow a [/] for comment to not end*/
 MULTI_LINE_COMMENT      (\/\*)([^\*]|\*[^\/])*(\*\/)
 /* Single line comments: Start //, End \n, In between everything is ignored */
 SINGLE_LINE_COMMENT    (\/\/)([^\n])*
+
+/* Comments: Multi-line or Single-line */
+COMMENT     ({MULTI_LINE_COMMENT})|({SINGLE_LINE_COMMENT})
 
 /* Ignore Whitespace */
 WHITESPACE  [ \t\n]
@@ -73,8 +76,7 @@ WHITESPACE  [ \t\n]
 {CONSTANT}  {printf("<CONSTANT, %s>\n", yytext);}
 {STRING_LITERAL}    {printf("<STRING_LITERAL, %s>\n", yytext);}
 {PUNCTUATORS}   {printf("<PUNCTUATOR, %s>\n", yytext);}
-{MULTI_LINE_COMMENT}   {printf("<COMMENT, %s>\n", yytext);}
-{SINGLE_LINE_COMMENT}  {printf("<COMMENT, %s>\n", yytext);}
+{COMMENT}       {printf("<COMMENT, %s>\n", yytext);}
 {WHITESPACE}    /*Ignore whitespace*/
 %%
 
