@@ -29,7 +29,7 @@ ESCAPE_SEQUENCE    "\'"|"\""|"\?"|"\\"|"\\a"|"\\b"|"\\f"|"\\n"|"\\r"|"\\t"|"\\v"
 /* c-char: escape-sequence or any character except single quote ', backslash \, or new line */
 C_CHAR              ({ESCAPE_SEQUENCE})|([^\'\\\n])
 /* c-char-sequence: c-char | c-char-sequence c-char */
-CHAR_SEQUENCE       {C_CHAR}+
+CHAR_SEQUENCE       {C_CHAR}*
 /* character-constant: 'c-char-sequence' */
 CHARACTER_CONSTANT  ([\'])({CHAR_SEQUENCE})([\'])
 
