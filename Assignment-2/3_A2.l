@@ -40,7 +40,7 @@ CONSTANT           ({INTEGER_CONSTANT})|({CHARACTER_CONSTANT})
 /* S-Char: escape-sequence or any character except double quote ", backslash \, or new line */
 S_CHAR              ({ESCAPE_SEQUENCE})|([^\"\\\n])
 /* S-Char-Sequence: S-Char | S-Char-Sequence S-Char */
-S_CHAR_SEQUENCE     {S_CHAR}+
+S_CHAR_SEQUENCE     {S_CHAR}*
 /* String-Literal: S-Char-Sequence_opt. Terminated by null = '\0' */
 STRING_LITERAL      ([\"])({S_CHAR_SEQUENCE})([\"])
 
