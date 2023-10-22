@@ -1,5 +1,5 @@
 all:
-	bison -d 3_A3.y
+	bison -d 3_A3.y 
 	flex -o lex.yy.c 3_A3.l
 	gcc -o parser lex.yy.c 3_A3.tab.c 3_A3.c -lfl -Werror
 
