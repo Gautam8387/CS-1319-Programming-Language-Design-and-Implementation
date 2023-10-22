@@ -83,3 +83,8 @@ WHITESPACE              [ \t\n\r]
 {WHITESPACE}            { /* Ignore Whitespace */ }
 .                       { printf("<INVALID_TOKEN, %s\n>", yytext);  return -1; }
 %%
+
+int yywrap()
+{
+	return 1;
+}

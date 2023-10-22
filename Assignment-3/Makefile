@@ -9,5 +9,5 @@ clean-head:
 clean-all: clean-head
 	rm -f parser
 
-test:
+test: all
 	./parser < 3_A3.nc

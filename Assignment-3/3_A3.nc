@@ -1,7 +1,8 @@
-/* Bubble Sort Algorithm in nanoC language.
-This is a test program for the lexer to tokenize.
-Group 03: julius-stabs-back
-Members: Gautam Ahuja, Nistha Singh
+/* 
+    Bubble Sort Algorithm in nanoC language.
+    This is a test program for the parser
+    Group 03: julius-stabs-back
+    Members: Gautam Ahuja, Nistha Singh
 */
 
 // Forward declarations
@@ -67,7 +68,3 @@ void bubbleSort(int n)
             if (arr[j] > arr[j + 1])
                 swap(&arr[j], &arr[j + 1]);
 }
-#include
-/* This is the ending multi-line comment.
-    It will not be read by the lexer as it stops above when it encounters the above invalid token '#'. 
-    The next work to # (include) will also be not read. */
