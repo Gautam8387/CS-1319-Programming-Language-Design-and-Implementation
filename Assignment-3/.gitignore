@@ -5,3 +5,4 @@ parser
 temp.txt
 *_temp.*
 temp/*
+*.zip

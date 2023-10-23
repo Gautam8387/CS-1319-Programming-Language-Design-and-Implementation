@@ -18,6 +18,9 @@
     char* str;
 };
 
+/* start symbol */
+%start translation_unit
+
 /* Terminals */
 %token CHARACTER                        // "char"
 %token ELSE                             // "else"  
@@ -60,9 +63,6 @@
 %token <ival> INTEGER_CONSTANT
 %token <str> CHARACTER_CONSTANT
 %token <str> STRING_LITERAL
-
-/* start symbol */
-%start translation_unit
 
 /* Operators Associativity and Precedence */
 /* As per the slides of module 5 */
