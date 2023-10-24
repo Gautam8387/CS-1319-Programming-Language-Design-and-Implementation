@@ -7,10 +7,13 @@ clean-head:
 	rm -f lex.yy.c 3_A3.tab.c 3_A3.tab.h
 
 clean-all: clean-head
-	rm -f parser
+	rm -f parser output.txt
 
-test: all
+test: build
 	./parser < 3_A3.nc
+
+test-out: build
+	./parser < 3_A3.nc > output.txt
 
 conflict:
 	bison -d 3_A3.y -t -Wcounterexamples

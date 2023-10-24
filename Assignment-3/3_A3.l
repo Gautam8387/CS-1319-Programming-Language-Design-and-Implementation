@@ -31,7 +31,7 @@ CONSTANT                ({INTEGER_CONSTANT})|({CHARACTER_CONSTANT})
 S_CHAR                  ({ESCAPE_SEQUENCE})|([^\"\\\n])
 S_CHAR_SEQUENCE         {S_CHAR}*
 STRING_LITERAL          ([\"])({S_CHAR_SEQUENCE})([\"])
-PUNCTUATORS             "["|"]"|"("|")"|"{"|"}"|"->"|"&"|"*"|"+"|"-"|"/"|"%"|"!"|"?"|"<"|">"|"<="|">="|"=="|"!="|"&&"|"||"|"="|":"|";"|","
+/* PUNCTUATORS             "["|"]"|"("|")"|"{"|"}"|"->"|"&"|"*"|"+"|"-"|"/"|"%"|"!"|"?"|"<"|">"|"<="|">="|"=="|"!="|"&&"|"||"|"="|":"|";"|"," */
 MULTI_LINE_COMMENT      (\/\*)([^\*]|\*[^\/])*(\*\/)
 SINGLE_LINE_COMMENT     (\/\/)([^\n])*
 COMMENT                 ({MULTI_LINE_COMMENT})|({SINGLE_LINE_COMMENT})
@@ -53,8 +53,8 @@ WHITESPACE              [ \t\n\r]
 {STRING_LITERAL}        { return STRING_LITERAL; }
 "["                     { return L_BOX_BRACKET; }
 "]"                     { return R_BOX_BRACKET; }
-"("                     { return L_PAREN; }
-")"                     { return R_PAREN; }
+"("                     { return L_PARENTHESIS; }
+")"                     { return R_PARENTHESIS; }
 "{"                     { return L_CURLY_BRACE; }
 "}"                     { return R_CURLY_BRACE; }
 "->"                    { return ARROW; }
@@ -78,7 +78,6 @@ WHITESPACE              [ \t\n\r]
 "="                     { return ASSIGN; }
 ";"                     { return SEMICOLON; }
 ","                     { return COMMA; }
-{PUNCTUATORS}           { return yytext[0]; }
 {COMMENT}               { /* Ignore Comments */ }
 {WHITESPACE}            { /* Ignore Whitespace */ }
 .                       { printf("<INVALID_TOKEN, %s\n>", yytext);  return -1; }

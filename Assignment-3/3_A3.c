@@ -11,9 +11,9 @@ extern void yyerror(char *s);
 
 // We are building Bison Parser
 int main(){
-    // Initialize the parser
-    // extern int yydebug;
+    // extern int yydebug; // for debugging
     // yydebug = 1;
+    // Initialize the parser
     int parser = yyparse();
     // If parser returns 0, then the input is valid
     if(parser == 0){

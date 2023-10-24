@@ -1,25 +1,28 @@
-int main() {
-	int a = 1 + 2;
-	//This is a comment
-	int b = 3 - (-4); //So is this
-	int c = -a;
-	int d = a *b;
-	int e = a / b;
-	int f = a % b;
+/* Group 03: julius-stabs-back */
+/* Gautam Ahuja, Nistha Singh */ 
 
-	int* aptr = &a;
-	int g = aptr->node;
-
-	int i;
-    // int arr[5] = {1,2,3,4,5};
-
-	for ( i = 0 ; i<= 5 ; i = i + 1 ) {
-		if (*aptr > b) {
-			return 1;
-		} else if (a != b) {
-			return 0;
-		} else {
-			return f;
-		} 
-	}
+char* copyArray(int *source, int *destination, int length) {
+    int i;
+	for (i = 0; i < length; i=i + 1) {
+        destination[i] = source[i];
+    }
+	return destination;
+	// Get Grades
+	int a = source[0];
+	int b = source[1];
+	int c = source[2];
+	if (a > b) {
+        if (a > c) {
+            return a;
+        } else {
+            return c;
+        }
+    } else {
+        if (b > c) {
+            return b;
+        } else {
+            return c;
+        }
+    }
+	return "Hello, World!";
 }
