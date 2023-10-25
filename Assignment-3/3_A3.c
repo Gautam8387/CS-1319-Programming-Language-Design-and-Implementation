@@ -7,8 +7,8 @@
 #include <string.h>
 #include "3_A3.tab.h"
 
-// extern void yyerror(char *s); // This function is called when there is a parsing error
-
+extern void yyerror(char *s); // This function is called when there is a parsing error
+extern int yyparse(void);
 // We are building Bison Parser
 int main(){
     // extern int yydebug; // for debugging

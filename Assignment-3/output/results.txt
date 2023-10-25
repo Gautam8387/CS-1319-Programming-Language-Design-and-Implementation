@@ -1,0 +1,8 @@
+Running Test Cases
+
+File ./sample_output_A3/bubble_sort.output is same as ./output/bubble_sort.output
+
+File ./sample_output_A3/corecursive_fibonacci.output is same as ./output/corecursive_fibonacci.output
+
+File ./sample_output_A3/error_test.output is same as ./output/error_test.output
+

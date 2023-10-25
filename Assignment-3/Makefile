@@ -22,7 +22,7 @@ test-sample: build
 	./parser < ./sample_output_A3/bubble_sort.nc > ./output/bubble_sort.output
 	./parser < ./sample_output_A3/corecursive_fibonacci.nc > ./output/corecursive_fibonacci.output
 	./parser < ./sample_output_A3/error_test.nc > ./output/error_test.output
-	python3 test-cases.py
+	python3 test-cases.py > ./output/results.txt
 
 conflict:
 	bison -d 3_A3.y -t -Wcounterexamples
