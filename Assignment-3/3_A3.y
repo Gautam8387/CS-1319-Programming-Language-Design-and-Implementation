@@ -15,7 +15,7 @@
 %}
 
 %union {
-    int ival;
+    int intval;
     char* str;
 };
 
@@ -48,7 +48,7 @@
 %token GREATER_THAN                     // ">" 
 %token LESS_THAN_EQUAL                  // "<="
 %token GREATER_THAN_EQUAL               // ">="
-%token DOUBLE_EQUAL                     // "=="
+%token IS_EQUAL                     // "=="
 %token NOT_EQUAL                        // "!="
 %token LOGICAL_AND                      // "&&"
 %token LOGICAL_OR                       // "||"
@@ -60,8 +60,8 @@
 %token PUNCTUATOR
 %token WS
 
-%token IDENTIFIER                       
-%token <ival> INTEGER_CONSTANT
+%token <str> IDENTIFIER                       
+%token <intval> INTEGER_CONSTANT
 %token <str> CHARACTER_CONSTANT
 %token <str> STRING_LITERAL
 
@@ -71,7 +71,7 @@
 %right QUESTION COLON
 %left LOGICAL_OR
 %left LOGICAL_AND
-%left NOT_EQUAL DOUBLE_EQUAL
+%left NOT_EQUAL IS_EQUAL
 %left LESS_THAN LESS_THAN_EQUAL GREATER_THAN GREATER_THAN_EQUAL
 %left PLUS MINUS
 %left ASTERISK DIV MOD
@@ -134,7 +134,7 @@ relational_expression : additive_expression {printf("relational-expression\n");}
                       ;
 
 equality_expression : relational_expression {printf("equality-expression\n");}
-                    | equality_expression DOUBLE_EQUAL relational_expression {printf("equality-expression\n");}
+                    | equality_expression IS_EQUAL relational_expression {printf("equality-expression\n");}
                     | equality_expression NOT_EQUAL relational_expression {printf("equality-expression\n");}
                     ;
 
@@ -174,10 +174,18 @@ type_specifier : VOID {printf("type-specifier\n");}
 declarator : pointer_opt direct_declarator {printf("declarator\n");}
            ;
 
+pointer_opt : pointer
+            | 
+            ;
+
 direct_declarator : IDENTIFIER {printf("direct-declarator\n");}
                   | IDENTIFIER L_BOX_BRACKET INTEGER_CONSTANT R_BOX_BRACKET {printf("direct-declarator\n");}
                   | IDENTIFIER L_PARENTHESIS parameter_list_opt R_PARENTHESIS {printf("direct-declarator\n");}
                   ;
+
+parameter_list_opt : parameter_list
+                   | 
+                   ;
 
 pointer : ASTERISK {printf("pointer\n");}
         ;
@@ -193,14 +201,6 @@ identifier_opt : IDENTIFIER
                | 
                ;
 
-parameter_list_opt : parameter_list
-                   | 
-                   ;
-
-pointer_opt : pointer
-            | 
-            ;
-
 initializer : assignment_expression {printf("initializer\n");}
             ;
 
@@ -215,13 +215,13 @@ statement : compound_statement {printf("statement\n");}
 compound_statement : L_CURLY_BRACE block_item_list_opt R_CURLY_BRACE {printf("compound-statement\n");}
                    ;
 
-block_item_list : block_item {printf("block-item-list\n");}
-                | block_item_list block_item {printf("block-item-list\n");}
-                ;   
-
 block_item_list_opt : block_item_list
                     | 
                     ;
+
+block_item_list : block_item {printf("block-item-list\n");}
+                | block_item_list block_item {printf("block-item-list\n");}
+                ;   
 
 block_item : declaration {printf("block-item\n");}
            | statement {printf("block-item\n");}
@@ -229,6 +229,10 @@ block_item : declaration {printf("block-item\n");}
 
 expression_statement : expression_opt SEMICOLON {printf("expression-statement\n");}
                      ;
+
+expression_opt : expression
+               |
+               ;
 
 selection_statement : IF L_PARENTHESIS expression R_PARENTHESIS statement {printf("selection-statement\n");}
                     | IF L_PARENTHESIS expression R_PARENTHESIS statement ELSE statement {printf("selection-statement\n");}
@@ -240,20 +244,20 @@ iteration_statement : FOR L_PARENTHESIS expression_opt SEMICOLON expression_opt 
 jump_statement : RETURN expression_opt SEMICOLON {printf("jump-statement\n");}
                ;
 
-expression_opt : expression
-               |
-               ;
-
 /* TRANSLATION UNIT */
-translation_unit : function_definition {printf("translation-unit\n");}
-                 | declaration {printf("translation-unit\n");}
+translation_unit : external_declaration {printf("translation-unit\n");}
+                 | translation_unit external_declaration {printf("translation-unit\n");}
                  ;
+
+external_declaration : declaration {printf("external-declaration\n");}
+                     | function_definition {printf("external-declaration\n");}
+                     ;
 
 function_definition : type_specifier declarator compound_statement {printf("function-definition\n");}
                     ;
 
 %%
-/* C++ Code for functions */
+/* C Code for functions */
 
 void yyerror(char *s) {
     printf("Error: %s on '%s'\n", s, yytext);

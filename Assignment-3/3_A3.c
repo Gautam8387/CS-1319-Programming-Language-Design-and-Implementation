@@ -7,7 +7,7 @@
 #include <string.h>
 #include "3_A3.tab.h"
 
-extern void yyerror(char *s);
+// extern void yyerror(char *s); // This function is called when there is a parsing error
 
 // We are building Bison Parser
 int main(){
@@ -15,7 +15,8 @@ int main(){
     // yydebug = 1;
     // Initialize the parser
     int parser = yyparse();
-    // If parser returns 0, then the input is valid
+    // If parser returns 0, then the input is valid, else invalid
+    /*
     if(parser == 0){
         printf("Valid Input\n");
     }
@@ -23,5 +24,6 @@ int main(){
     else{
         printf("Invalid Input\n");
     }
+    */
     return 0;    
 }

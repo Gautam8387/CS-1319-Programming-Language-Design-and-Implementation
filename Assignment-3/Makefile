@@ -6,14 +6,23 @@ build:
 clean-head:
 	rm -f lex.yy.c 3_A3.tab.c 3_A3.tab.h
 
-clean-all: clean-head
-	rm -f parser output.txt
+clean-out: clean-head
+	rm -f parser
+
+clean-all: clean-out
+	rm -f 3_A3_nc_output.txt
 
 test: build
 	./parser < 3_A3.nc
 
 test-out: build
-	./parser < 3_A3.nc > output.txt
+	./parser < 3_A3.nc > 3_A3_nc_output.txt
+
+test-sample: build
+	./parser < ./sample_output_A3/bubble_sort.nc > ./output/bubble_sort.output
+	./parser < ./sample_output_A3/corecursive_fibonacci.nc > ./output/corecursive_fibonacci.output
+	./parser < ./sample_output_A3/error_test.nc > ./output/error_test.output
+	python3 test-cases.py
 
 conflict:
 	bison -d 3_A3.y -t -Wcounterexamples

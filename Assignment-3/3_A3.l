@@ -22,7 +22,7 @@ IDENTIFIER              [_a-zA-Z][_a-zA-Z0-9]*
 SIGN                    [+-]
 NONZERO_DIGIT           [1-9]
 DIGIT                   [0-9]
-INTEGER_CONSTANT        0|({SIGN}?({NONZERO_DIGIT}))({DIGIT})*
+INTEGER_CONSTANT        0|{NONZERO_DIGIT}{DIGIT}*
 ESCAPE_SEQUENCE         "\'"|"\""|"\?"|"\\"|"\\a"|"\\b"|"\\f"|"\\n"|"\\r"|"\\t"|"\\v"
 C_CHAR                  ({ESCAPE_SEQUENCE})|([^\'\\\n])
 CHAR_SEQUENCE           {C_CHAR}*
@@ -69,7 +69,7 @@ WHITESPACE              [ \t\n\r]
 ">"                     { return GREATER_THAN; }
 "<="                    { return LESS_THAN_EQUAL; }
 ">="                    { return GREATER_THAN_EQUAL; }
-"=="                    { return DOUBLE_EQUAL; }
+"=="                    { return IS_EQUAL; }
 "!="                    { return NOT_EQUAL; }
 "&&"                    { return LOGICAL_AND; }
 "||"                    { return LOGICAL_OR; }
@@ -80,7 +80,7 @@ WHITESPACE              [ \t\n\r]
 ","                     { return COMMA; }
 {COMMENT}               { /* Ignore Comments */ }
 {WHITESPACE}            { /* Ignore Whitespace */ }
-.                       { printf("<INVALID_TOKEN, %s\n>", yytext);  return -1; }
+.                       { printf("<INVALID_TOKEN, %s>\n", yytext);  return -1; }
 %%
 
 int yywrap()
