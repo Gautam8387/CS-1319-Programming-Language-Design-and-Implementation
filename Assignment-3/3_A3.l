@@ -80,7 +80,7 @@ WHITESPACE              [ \t\n\r]
 ","                     { return COMMA; }
 {COMMENT}               { /* Ignore Comments */ }
 {WHITESPACE}            { /* Ignore Whitespace */ }
-.                       { printf("<INVALID_TOKEN, %s>\n", yytext);  return -1; }
+.                       { return -1; }
 %%
 
 int yywrap()

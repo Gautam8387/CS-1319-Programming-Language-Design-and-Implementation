@@ -31,6 +31,9 @@ if __name__ == "__main__":
         # check if contents are the same
         if(expected_lines == actual_lines):
             print(f"File {expected_file_path} is same as {actual_file_path}\n")
+            print("Diff Output:")
+            os.system(f"diff {expected_file_path} {actual_file_path}")
+            print("")
             
         else:
             print(f"Not Same: {temp}")
