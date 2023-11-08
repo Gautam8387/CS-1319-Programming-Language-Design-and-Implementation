@@ -10,3 +10,6 @@ This assignment is to understand the ```x86``` assembly language.
 
 ## Assignment 2
 This assignment is to write a lexical analyzer for nanoC. The lexical analyzer is implemented using ```Lex```.
+
+## Assignment 3
+This assignment is to write a parser for nanoC. The parser is implemented using ```Bison```. Modified the lexer accordingly.
