@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "Parser.h"
 
+symboltable symtab[NSYMS];	// -> Definition
+
 extern void yyerror(char *s);
 
 symboltable *symlook(char *s) {

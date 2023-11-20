@@ -9,11 +9,13 @@
 #include "Parser.h"
 
 extern int yylex();
+
 void yyerror(char *s);
 void printrule(char *s);
 
 quad *qArray[NSYMS]; // Store of Quads
 int quadPtr = 0; // Index of next quad
+
 %}
 %union { // Placeholder for a value
 	int intval;
@@ -96,9 +98,9 @@ void printrule(char *s) {
 }
 int main() {
 	yyparse();
-
 	for (int i = 0; i < quadPtr; i = i + 1)
 		print_quad(qArray[i]);
+	
 	return 0;
 }
 
