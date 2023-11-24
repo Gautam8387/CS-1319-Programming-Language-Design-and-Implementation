@@ -4,9 +4,12 @@
 /* Declarations */
 %{
     #include <string.h>
+    #include <stdlib.h>
+    #include <math.h>
     #include <stdio.h>
     #include "3_A4.tab.h" 
-    #include "3_parser.h"
+    #include "3_A4_translator.h"
+    // extern YYSTYPE yylval;
 %}
 
 /* Regular Expressions */
@@ -49,7 +52,7 @@ WHITESPACE              [ \t\n\r]
 {RETURN}                { return RETURN; }
 {VOID}                  { return VOID; }
 {IDENTIFIER}            { 
-                            yylval.symp = symlook(yytext); // sym * symlook(char * s)
+                            yylval.sym_entry = lookup(currST, yytext);
                             return IDENTIFIER; 
                         }
 {INTEGER_CONSTANT}      { 

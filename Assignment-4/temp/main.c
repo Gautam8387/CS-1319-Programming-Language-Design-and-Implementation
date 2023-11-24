@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "3_A4.tab.h"
 #include "parser.h"
 
 #define MAX_QUADS 10000
