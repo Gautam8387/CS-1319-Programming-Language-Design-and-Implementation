@@ -5,7 +5,8 @@
 %{
     #include <string.h>
     #include <stdio.h>
-    #include "3_A3.tab.h" 
+    #include "3_A4.tab.h" 
+    #include "3_parser.h"
 %}
 
 /* Regular Expressions */
@@ -25,7 +26,7 @@ DIGIT                   [0-9]
 INTEGER_CONSTANT        0|{NONZERO_DIGIT}{DIGIT}*
 ESCAPE_SEQUENCE         \\['"?\\abfnrtv]
 C_CHAR                  ({ESCAPE_SEQUENCE})|([^\'\\\n])
-CHAR_SEQUENCE           {C_CHAR}+
+CHAR_SEQUENCE           {C_CHAR}
 CHARACTER_CONSTANT      ([\'])({CHAR_SEQUENCE})([\'])
 CONSTANT                ({INTEGER_CONSTANT})|({CHARACTER_CONSTANT})
 S_CHAR                  ({ESCAPE_SEQUENCE})|([^\"\\\n])
@@ -47,10 +48,22 @@ WHITESPACE              [ \t\n\r]
 {INTEGER}               { return INTEGER; }
 {RETURN}                { return RETURN; }
 {VOID}                  { return VOID; }
-{IDENTIFIER}            { return IDENTIFIER; }
-{INTEGER_CONSTANT}      { return INTEGER_CONSTANT; }
-{CHARACTER_CONSTANT}    { return CHARACTER_CONSTANT; }
-{STRING_LITERAL}        { return STRING_LITERAL; }
+{IDENTIFIER}            { 
+                            yylval.symp = symlook(yytext); // sym * symlook(char * s)
+                            return IDENTIFIER; 
+                        }
+{INTEGER_CONSTANT}      { 
+                            yylval.intval = atoi(yytext); 
+                            return INTEGER_CONSTANT;
+                        }
+{CHARACTER_CONSTANT}    { 
+                            yylval.charval = yytext[1];
+                            return CHARACTER_CONSTANT;
+                        }
+{STRING_LITERAL}        { 
+                            yylval.strval = strdup(yytext);
+                            return STRING_LITERAL; 
+                        }
 "["                     { return L_BOX_BRACKET; }
 "]"                     { return R_BOX_BRACKET; }
 "("                     { return L_PARENTHESIS; }

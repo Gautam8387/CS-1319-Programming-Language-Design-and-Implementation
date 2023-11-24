@@ -25,7 +25,7 @@ DIGIT                   [0-9]
 INTEGER_CONSTANT        0|{NONZERO_DIGIT}{DIGIT}*
 ESCAPE_SEQUENCE         \\['"?\\abfnrtv]
 C_CHAR                  ({ESCAPE_SEQUENCE})|([^\'\\\n])
-CHAR_SEQUENCE           {C_CHAR}+
+CHAR_SEQUENCE           {C_CHAR}
 CHARACTER_CONSTANT      ([\'])({CHAR_SEQUENCE})([\'])
 CONSTANT                ({INTEGER_CONSTANT})|({CHARACTER_CONSTANT})
 S_CHAR                  ({ESCAPE_SEQUENCE})|([^\"\\\n])
