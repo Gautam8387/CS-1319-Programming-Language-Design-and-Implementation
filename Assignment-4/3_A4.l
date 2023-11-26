@@ -56,11 +56,11 @@ WHITESPACE              [ \t\n\r]
                             return IDENTIFIER; 
                         }
 {INTEGER_CONSTANT}      { 
-                            yylval.intval = atoi(yytext); 
+                            yylval.intval = strdup(yytext); 
                             return INTEGER_CONSTANT;
                         }
 {CHARACTER_CONSTANT}    { 
-                            yylval.charval = yytext[1];
+                            yylval.charval = strdup(yytext);
                             return CHARACTER_CONSTANT;
                         }
 {STRING_LITERAL}        { 
