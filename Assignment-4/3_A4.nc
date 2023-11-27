@@ -1,2 +1,4 @@
-int as=69;
-char s = 'a';
+int a = 5;
+int ba = +a;
+int* ptr = &a;
+int result = -*ptr;

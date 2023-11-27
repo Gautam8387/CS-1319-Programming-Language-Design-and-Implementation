@@ -117,6 +117,8 @@ int get_size(symboltype* type){
             return size_of_pointer;
         case TYPE_ARRAY:
             return type->width * get_size(type->ptr);
+        case TYPE_STRING:
+            return type->width;
     }
 }
 
@@ -143,6 +145,8 @@ char* printType(symboltype* type){
         case TYPE_FUNC:
         // TO EDIT: int x (int, char) -> int, etc.
             return "function";
+        case TYPE_STRING:
+            return "string";
         default:
             return "NULL";
     }
@@ -238,7 +242,7 @@ symboltableentry* gentemp(symboltype* type, char* initial_value) {
     symboltableentry* tempEntry = lookup(currST, tempName);
     // Update type and initial value
     update_type(tempEntry, type);
-    tempEntry->initial_value = strdup(initial_value);
+    (initial_value==NULL)?(tempEntry->initial_value = NULL):(tempEntry->initial_value = strdup(initial_value));
     tempEntry->category = TYPE_TEMP;
     return tempEntry;
 }

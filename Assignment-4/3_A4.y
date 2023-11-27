@@ -22,6 +22,7 @@
     char* strval;
     char* charval;
     char* u_op;
+    int count;
     char UNIARY_OPERATOR;
     struct symboltableentry* sym_entry;
     struct symboltype* sym_type;
@@ -93,6 +94,7 @@
 %type <expr> statement compound_statement selection_statement iteration_statement jump_statement block_item block_item_list block_item_list_opt 
 %type <sym_entry> initializer direct_declarator init_declarator declarator identifier_opt
 %type <u_op> pointer_opt pointer unary_operator
+%type <count> argument_expression_list_opt argument_expression_list
 
 %%
 /* Grammar Rules */
@@ -102,7 +104,6 @@ primary_expression : IDENTIFIER {
                             // new expression
                             $$ = create_expression();
                             $$->loc = $1;
-                            $$->isBool = false;
                             printf("primary-expression\n");
                         }
                    | constant {
@@ -145,24 +146,120 @@ postfix_expression : primary_expression {
                             $$->arrBase = $1->loc;  // set the array base to the location of the primary expression
                             printf("postfix-expression\n");
                         }
-                   | postfix_expression L_BOX_BRACKET expression R_BOX_BRACKET {printf("postfix-expression\n");}
-                   | postfix_expression L_PARENTHESIS argument_expression_list_opt R_PARENTHESIS {printf("postfix-expression\n");}
-                   | postfix_expression ARROW IDENTIFIER {printf("postfix-expression\n");}
+                   | postfix_expression L_BOX_BRACKET expression R_BOX_BRACKET {
+                            $$ = create_expression();
+                            // set flag to array
+                            $$->isArray = true;
+                            $$->loc = $3->loc;
+                            // set the array base to the location of the postfix expression
+                            $$->arrBase = $1->loc;
+                            printf("postfix-expression\n");
+                        }
+                   | postfix_expression L_PARENTHESIS argument_expression_list_opt R_PARENTHESIS {
+                            // This is a function call
+                            $$ = create_expression();
+                            // check if the postfix expression points to a function symbol table entry
+                            if($1->loc->next != NULL){
+                                // generate temp of type of return value of function.
+                                // f# = call function, para#
+                                $$->loc = gentemp($1->loc->next->_retVal, NULL);
+                                $$->arrBase = $$->loc;
+                                // emit the code for function call. Paramter count is in argument_expression_list_opt
+
+                            }
+                            // function not defined
+                            else{
+                                char* temp = "Function not defined for ";
+                                sprintf(temp, "%s\n", $1->loc->name);
+                                yyerror(temp);
+                            }
+                            printf("postfix-expression\n");
+                        }
+                   | postfix_expression ARROW IDENTIFIER {
+                            // we do not have any structs or classes in our language.
+                            $$ = $1;
+                            printf("postfix-expression\n");
+                        }
                    ;
 
-argument_expression_list_opt : argument_expression_list
-                             |
+argument_expression_list_opt : argument_expression_list {
+                                    // this is parameter list
+                                    $$ = $1;                                    
+                                }
+                             | {
+                                    $$ = 0;
+                                }
                              ;
 
-argument_expression_list : assignment_expression {printf("argument-expression-list\n");}
-                         | argument_expression_list COMMA assignment_expression {printf("argument-expression-list\n");}
+argument_expression_list : assignment_expression {
+                                // this is single parameter
+                                $$ = 1;
+                                // emit the code for parameter
+                                printf("argument-expression-list\n");
+                            }
+                         | argument_expression_list COMMA assignment_expression {
+                                // this is a list of parameters
+                                $$ = $1 + 1;
+                                // emit the code for parameter
+                                printf("argument-expression-list\n");
+                            }
                          ;
 
 unary_expression : postfix_expression {
                         $$ = $1;
                         printf("unary-expression\n");
                     }
-                 | unary_operator unary_expression {printf("unary-expression\n");}
+                 | unary_operator unary_expression {
+                        // this is rule used for unary operators preceding a postfix expression
+                        $$ = create_expression();
+                        
+                        // check the unary_operator type
+                        if(strcmp($1, "&") == 0){
+                            // an operator is refering to a variable address. It has to be a pointer
+                            // struct symboltype* temp = create_symboltype(TYPE_PTR, 1, NULL);
+                            $$->arrBase = gentemp(create_symboltype(TYPE_PTR, 1, NULL), NULL);
+                            $$->arrBase->type->ptr = $2->arrBase->type;
+                            // emit the code for refering
+                        }
+
+                        else if(strcmp($1, "*") == 0){
+                            // an operator is dereferencing a pointer. It has returned a value
+                            $$->loc = gentemp($2->arrBase->type->ptr, NULL);
+                            $$->isPtr = true;
+                            $$->arrBase = $2->arrBase;
+                            // emit the code for dereferencing
+                        }
+
+                        else if(strcmp($1, "+") == 0){
+                            // unary plus is normal plus, propagate the type
+                            $$ = $2;
+                        }
+
+                        else if(strcmp($1, "-") == 0){
+                            // unary minus is flipping the sign, propagate the results
+                            struct symboltype* temp = create_symboltype($2->arrBase->type->type, 1, NULL);
+                            $$->arrBase = gentemp(temp, NULL);
+                            // emit the code for unary expression
+
+                        }
+                        else if(strcmp($1, "!") == 0){
+                            // unary not is flipping the boolean. Reverse the list of true and false
+                            if($2->isBool){
+                                // flip the lists
+                                $$->trueList = $2->falseList;
+                                $$->falseList = $2->trueList;
+                                $$->isBool = true;
+                                $$->arrBase = $2->arrBase;
+                                $$->loc = $2->loc;
+                            }
+                            else{
+                                // wrong type for unary not
+                                char* temp = "Boolean Expressions not allowed\n";
+                                yyerror(temp);
+                            }
+                        }
+                        printf("unary-expression\n");
+                    }
                  ;
 
 unary_operator : AMPERSAND {
@@ -344,7 +441,15 @@ direct_declarator : IDENTIFIER {
                             $$ = $1;
                             printf("direct-declarator\n");
                         }
-                  | IDENTIFIER L_BOX_BRACKET INTEGER_CONSTANT R_BOX_BRACKET {printf("direct-declarator\n");}
+                  | IDENTIFIER L_BOX_BRACKET INTEGER_CONSTANT R_BOX_BRACKET {
+                            $1 = lookup(currST, $1->name);
+                            // type entry
+                            update_type($1, create_symboltype(pop(&var_type), 1, NULL));
+                            // set array flag
+                            update_type($1, create_symboltype(TYPE_ARRAY, atoi($3), $1->type));
+                            $$ = $1;
+                            printf("direct-declarator\n");
+                        }
                   | IDENTIFIER L_PARENTHESIS parameter_list_opt R_PARENTHESIS {printf("direct-declarator\n");}
                   ;
 

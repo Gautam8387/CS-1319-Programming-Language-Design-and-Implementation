@@ -28,7 +28,8 @@ enum symboltype_enum {
     TYPE_CHAR,
     TYPE_PTR,
     TYPE_FUNC,
-    TYPE_ARRAY
+    TYPE_ARRAY,
+    TYPE_STRING
 };
 
 enum category_enum {
