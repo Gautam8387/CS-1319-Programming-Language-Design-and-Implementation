@@ -478,7 +478,7 @@ void print_quad(quad* arr){
             printf("goto %s\n", arr->result);
             break;
         case OP_ASSIGN:
-            printf("%s = %s\n", arr->arg1 , arr->result);
+            printf("%s = %s\n", arr->result , arr->arg1);
             break;
         case OP_ASSIGN_STR:
             printf("%s = string(%s)\n", arr->result, arr->arg1);
@@ -557,9 +557,9 @@ void emit(enum op_code op, char* arg1, char* arg2, char* result){
     curr->nextQuad = (qArray*)malloc(sizeof(qArray));
     curr->nextQuad->arr = (quad*)malloc(sizeof(quad));
     curr->nextQuad->arr->op = op;
-    (arg1 == NULL)?(quadArray->arr->arg1 = NULL):(quadArray->arr->arg1 = strdup(arg1));
-    (arg2 == NULL)?(quadArray->arr->arg2 = NULL):(quadArray->arr->arg2 = strdup(arg2));
-    (result == NULL)?(quadArray->arr->result = NULL):(quadArray->arr->result = strdup(result));
+    (arg1 == NULL)?(curr->nextQuad->arr->arg1 = NULL):(curr->nextQuad->arr->arg1 = strdup(arg1));
+    (arg2 == NULL)?(curr->nextQuad->arr->arg2 = NULL):(curr->nextQuad->arr->arg2 = strdup(arg2));
+    (result == NULL)?(curr->nextQuad->arr->result = NULL):(curr->nextQuad->arr->result = strdup(result));
     curr->nextQuad->count = curr->count + 1;
     curr->nextQuad->nextQuad = NULL;
     return;

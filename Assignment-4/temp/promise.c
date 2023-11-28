@@ -114,6 +114,20 @@ struct Sym* create_Sym(char* name, char* init_val, struct SymType* arrtype, int 
 }
 
 
+struct Sym* create_Sym(char* name, char* init_val, struct SymType* arrtype, int width) {
+    struct Sym* sym = malloc(sizeof(struct Sym));
+
+    strcpy(sym->name, name);
+    sym->type = create_SymType("int", NULL, 0);  // Assuming default type is "int" for simplicity
+    sym->size = computeSize(sym->type);
+    strcpy(sym->init_val, init_val);
+    sym->offset = 0;
+    sym->nested = NULL;
+
+    return sym;
+}
+
+
 struct Sym* gentemp(struct SymType* type, char* init_val) {
     char tmp_name[256];
     sprintf(tmp_name, "t%d", currST->count++);

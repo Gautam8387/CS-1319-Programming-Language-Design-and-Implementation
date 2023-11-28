@@ -121,7 +121,7 @@ primary_expression : IDENTIFIER {
                             // Store the String in linekd list of strings
                             ll_insert(string_head, $1);
                             // emit the results, set size of linked list
-                            emit(OP_ASSIGN_STR, $$->loc->name, $1, NULL);
+                            emit(OP_ASSIGN_STR, $1, NULL, $$->loc->name);
                             printf("primary-expression\n");
                         }
                    | L_PARENTHESIS expression R_PARENTHESIS {
@@ -135,7 +135,7 @@ constant : INTEGER_CONSTANT {
                 // generate a temporary entry for the integer constant
                 $$->loc = gentemp(create_symboltype(TYPE_INT, 1, NULL), $1);
                 // emit the results
-                emit(OP_ASSIGN, $$->loc->name, NULL, $1);
+                emit(OP_ASSIGN, $1, NULL, $$->loc->name);
 
             }
          | CHARACTER_CONSTANT{
@@ -143,7 +143,7 @@ constant : INTEGER_CONSTANT {
                 // generate a temporary entry for the character constant
                 $$->loc = gentemp(create_symboltype(TYPE_CHAR, 1, NULL), $1);
                 // emit the results
-                emit(OP_ASSIGN, $$->loc->name, $1, NULL);
+                emit(OP_ASSIGN, $1, NULL, $$->loc->name);
             }
          ;
 
@@ -324,7 +324,7 @@ multiplicative_expression : unary_expression {
                                         // t# = a*b; of type of a
                                         $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
                                         // emit the code for multiplication
-                                        emit(OP_MULT, $$->loc->name, $1->loc->name, $3->arrBase->name);
+                                        emit(OP_MULT, $1->loc->name, $3->arrBase->name, $$->loc->name);
                                     }
                                     else{
                                         // conversion ???
@@ -338,7 +338,7 @@ multiplicative_expression : unary_expression {
                                         // t# = a/b; of type of a
                                         $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
                                         // emit the code for division
-                                        emit(OP_DIV, $$->loc->name, $1->loc->name, $3->arrBase->name);
+                                        emit(OP_DIV, $1->loc->name, $3->arrBase->name, $$->loc->name);
                                     }
                                     else{
                                         // conversion ???
@@ -352,7 +352,7 @@ multiplicative_expression : unary_expression {
                                         // t# = a%b; of type of a
                                         $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
                                         // emit the code for modulus
-                                        emit(OP_MOD, $$->loc->name, $1->loc->name, $3->arrBase->name);  
+                                        emit(OP_MOD, $1->loc->name, $3->arrBase->name, $$->loc->name);  
                                     }
                                     else{
                                         // conversion ???
@@ -372,7 +372,7 @@ additive_expression : multiplicative_expression {
                                 // t# = a+b; of type of a
                                 $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
                                 // emit the code for addition
-                                emit(OP_PLUS, $$->loc->name, $1->loc->name, $3->loc->name);
+                                emit(OP_PLUS, $1->loc->name, $3->loc->name, $$->loc->name);
                             }
                             else{
                                 // conversion ???
@@ -386,7 +386,7 @@ additive_expression : multiplicative_expression {
                                 // t# = a-b; of type of a
                                 $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
                                 // emit the code for subtraction
-                                emit(OP_MINUS, $$->loc->name, $1->loc->name, $3->loc->name);
+                                emit(OP_MINUS, $1->loc->name, $3->loc->name, $$->loc->name);
                             }
                             else{
                                 // conversion ???
@@ -472,6 +472,7 @@ init_declarator : declarator {
                                 // update type of initializer
                                 update_type($3, $1->type);
                             }
+                        emit(OP_ASSIGN, $3->name, NULL, $1->name);
                         printf("init-declarator\n"); 
                     }
                 ;
