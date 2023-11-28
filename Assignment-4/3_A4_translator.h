@@ -39,6 +39,57 @@ enum category_enum {
     TYPE_TEMP
 };
 
+enum op_code{
+    OP_PLUS,
+    OP_MINUS,
+    OP_MULT,
+    OP_DIV,
+    OP_MOD,
+    OP_EQUALS,
+    OP_NOT_EQUALS,
+    OP_LT,
+    OP_LT_EQUALS,
+    OP_GT,
+    OP_GT_EQUALS,
+    OP_GOTO,
+    OP_ASSIGN,
+    OP_ASSIGN_STR,
+    OP_ASSIGN_AMPER,
+    OP_ASSIGN_ASTERISK,
+    OP_ASTERISK_ASSIGN,
+    OP_UMINUS,
+    OP_ASSIGN_BOX,
+    OP_BOX_ASSIGN,
+    OP_RETURN,
+    OP_PARAM,
+    OP_CALL,
+    OP_FUNC,
+    OP_LABEL
+};
+
+/**************************************************************************/
+/*                              QUADS and TAC                             */
+/**************************************************************************/
+struct quad{
+    enum op_code op;                 // Operator
+    char* arg1;               // Argument 1
+    char* arg2;               // Argument 2
+    char* result;             // Result
+};
+typedef struct quad quad;
+struct qArray{       // Linked list of quads
+    quad* arr;          // Array of quads
+    int count;          // Total number of quads
+    struct qArray* nextQuad; // Pointer to next qArray
+};
+typedef struct qArray qArray;
+
+void print_quadArray(qArray* head); // Print the quads
+void print_quad(quad* q);              // Print a single quad
+void emit(enum op_code op, char* arg1, char* arg2, char* result);  // Emit a quad -- add to quadArray
+char* printOP(enum op_code op); // Print the operator
+int nextInstr(); // Get the next instruction number
+
 
 /**************************************************************************/
 /*                        SYMBOL TABLE STRUCTURES                         */
@@ -66,7 +117,8 @@ struct symboltable{            // Structure of a symbol table (TABLE)
     struct symboltable* parent; // Pointer to parent symbol table
     int count;                 // Count of entries in symbol table
     int tempCount;             // Count of temporary variables in symbol table
-    symboltableentry* _argList; // List of arguments of function
+    int paramCount;            // Count of parameters in symbol table
+    symboltableentry** _argList; // List of arguments of function
     symboltableentry** table_entries;   // Pointer to entries in symbol table -- linked list of entries
     symboltype* _retVal;        // Return type of function
     struct symboltable* next;         // Pointer to next symbol table
@@ -86,16 +138,19 @@ struct expression{
     int* trueList;         // List of true labels
     int* falseList;        // List of false labels
     int* nextList;         // List of next labels
+    int returnLabel;       // Return label
 };
 typedef struct expression expression;
 
 struct statement{
     int* nextList;         // List of next labels
+    int returnLabel;       // Return label
 };
 typedef struct statement statement;
 
 expression* create_expression();
-
+statement* create_statement();
+void backpatch(int* list, int label); // Backpatch a list of labels with a label
 
 /**************************************************************************/
 /*                            VARIABLE STACK                              */
@@ -128,14 +183,17 @@ void ll_delete(string_list* head);
 /*                        SYMBOL TABLE FUNCTIONS                          */
 /**************************************************************************/
 symboltableentry *lookup(symboltable* currST, char* yytext); // Lookup a symbol in the symbol table
-symboltable* create_symboltable(char* name); // Create a new symbol table
+symboltable* create_symboltable(char* name, symboltable* parent); // Create a new symbol table
 symboltype* create_symboltype(enum symboltype_enum type, int width, symboltype* ptr); // Create a new symbol type
 symboltableentry* gentemp(symboltype* type, char* initial_value); // Generate a temporary variableint get_size(symboltype* type); // Get the width of a symbol
+symboltableentry* genparam(symboltype* type, char* initial_value); // Generate a parameter
 void update_type(symboltableentry* entry, symboltype* type); // Update the type of a symbol
 void update_table(symboltable* currST, symboltableentry* entry); // Update the symbol table
 void print_ST(symboltable *currST); // Print the symbol table
 void upddate_ST(symboltable* currST, symboltableentry* entry); // Update the symbol table
 char* printType(symboltype* type); // Print the type of a symbol
 char* printCategory(enum category_enum category); // Print the category of a symbol
+int typecheck(symboltype* type1, symboltype* type2); // Check if two types are equal
+void push_args(symboltable* currST, symboltableentry* arg); // Push arguments to the symbol table
 
 #endif // __PARSER_H
