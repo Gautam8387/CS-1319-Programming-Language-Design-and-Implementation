@@ -23,6 +23,7 @@
     char* charval;
     char* u_op;
     int count;
+    int instr_no;
     char UNIARY_OPERATOR;
     struct symboltableentry* sym_entry;
     struct symboltype* sym_type;
@@ -89,12 +90,14 @@
 
 /* Non-Terminals */
 //Expressions
-%type <expr> primary_expression expression postfix_expression unary_expression multiplicative_expression additive_expression relational_expression
-%type <expr> constant equality_expression logical_and_expression logical_or_expression conditional_expression assignment_expression expression_statement
-%type <expr> statement compound_statement selection_statement iteration_statement jump_statement block_item block_item_list block_item_list_opt 
+%type <expr> primary_expression expression postfix_expression unary_expression multiplicative_expression 
+%type <expr> additive_expression relational_expression constant equality_expression logical_and_expression 
+%type <expr> logical_or_expression conditional_expression assignment_expression expression_statement expression_opt
+%type <stmt> statement compound_statement selection_statement iteration_statement jump_statement block_item block_item_list block_item_list_opt 
 %type <sym_entry> initializer direct_declarator init_declarator declarator identifier_opt
 %type <u_op> pointer_opt pointer unary_operator
 %type <count> argument_expression_list_opt argument_expression_list
+%type <instr_no> N
 
 %%
 /* Grammar Rules */
@@ -118,6 +121,7 @@ primary_expression : IDENTIFIER {
                             // Store the String in linekd list of strings
                             ll_insert(string_head, $1);
                             // emit the results, set size of linked list
+                            emit(OP_ASSIGN_STR, $$->loc->name, $1, NULL);
                             printf("primary-expression\n");
                         }
                    | L_PARENTHESIS expression R_PARENTHESIS {
@@ -131,6 +135,7 @@ constant : INTEGER_CONSTANT {
                 // generate a temporary entry for the integer constant
                 $$->loc = gentemp(create_symboltype(TYPE_INT, 1, NULL), $1);
                 // emit the results
+                emit(OP_ASSIGN, $$->loc->name, NULL, $1);
 
             }
          | CHARACTER_CONSTANT{
@@ -138,6 +143,7 @@ constant : INTEGER_CONSTANT {
                 // generate a temporary entry for the character constant
                 $$->loc = gentemp(create_symboltype(TYPE_CHAR, 1, NULL), $1);
                 // emit the results
+                emit(OP_ASSIGN, $$->loc->name, $1, NULL);
             }
          ;
 
@@ -165,7 +171,10 @@ postfix_expression : primary_expression {
                                 $$->loc = gentemp($1->loc->next->_retVal, NULL);
                                 $$->arrBase = $$->loc;
                                 // emit the code for function call. Paramter count is in argument_expression_list_opt
-
+                                // convert $3 to string
+                                char intTOstr[10];
+                                sprintf(intTOstr, "%d", $3);
+                                emit(OP_CALL, $$->loc->name, $1->loc->name, intTOstr);
                             }
                             // function not defined
                             else{
@@ -195,12 +204,14 @@ argument_expression_list : assignment_expression {
                                 // this is single parameter
                                 $$ = 1;
                                 // emit the code for parameter
+                                emit(OP_PARAM, $1->loc->name, NULL, NULL);
                                 printf("argument-expression-list\n");
                             }
                          | argument_expression_list COMMA assignment_expression {
                                 // this is a list of parameters
                                 $$ = $1 + 1;
                                 // emit the code for parameter
+                                emit(OP_PARAM, $3->loc->name, NULL, NULL);
                                 printf("argument-expression-list\n");
                             }
                          ;
@@ -220,6 +231,7 @@ unary_expression : postfix_expression {
                             $$->arrBase = gentemp(create_symboltype(TYPE_PTR, 1, NULL), NULL);
                             $$->arrBase->type->ptr = $2->arrBase->type;
                             // emit the code for refering
+                            emit(OP_ASSIGN_AMPER, $$->arrBase->name, $2->arrBase->name, NULL);
                         }
 
                         else if(strcmp($1, "*") == 0){
@@ -228,6 +240,7 @@ unary_expression : postfix_expression {
                             $$->isPtr = true;
                             $$->arrBase = $2->arrBase;
                             // emit the code for dereferencing
+                            emit(OP_ASSIGN_ASTERISK, $$->loc->name, $2->arrBase->name, NULL);
                         }
 
                         else if(strcmp($1, "+") == 0){
@@ -240,6 +253,7 @@ unary_expression : postfix_expression {
                             struct symboltype* temp = create_symboltype($2->arrBase->type->type, 1, NULL);
                             $$->arrBase = gentemp(temp, NULL);
                             // emit the code for unary expression
+                            emit(OP_UMINUS, $$->arrBase->name, $2->arrBase->name, NULL);
 
                         }
                         else if(strcmp($1, "!") == 0){
@@ -294,7 +308,7 @@ multiplicative_expression : unary_expression {
                                         // new temporary entry for array in current symbol table
                                         $$->loc = gentemp($1->loc->type, $1->loc->initial_value);
                                         // emit the code for array
-
+                                        emit(OP_ASSIGN_BOX, $$->loc->name, $1->arrBase->name, $1->loc->initial_value);
                                         // reset array flag
                                         $1->isArray = false;
                                     }else{
@@ -303,17 +317,83 @@ multiplicative_expression : unary_expression {
                                     }
                                     printf("multiplicative-expression\n");
                                 }
-                          | multiplicative_expression ASTERISK unary_expression {printf("multiplicative-expression\n");}
-                          | multiplicative_expression DIV unary_expression {printf("multiplicative-expression\n");}
-                          | multiplicative_expression MOD unary_expression {printf("multiplicative-expression\n");}
+                          | multiplicative_expression ASTERISK unary_expression {
+                                    // check if both expressions are of same type or need conversion
+                                    if(typecheck($1->loc->type, $3->arrBase->type)){
+                                        $$ = create_expression();
+                                        // t# = a*b; of type of a
+                                        $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
+                                        // emit the code for multiplication
+                                        emit(OP_MULT, $$->loc->name, $1->loc->name, $3->arrBase->name);
+                                    }
+                                    else{
+                                        // conversion ???
+                                        yyerror("Type mismatch in multiplicative MULT expression\n");
+                                    }
+                                    printf("multiplicative-expression\n");
+                                }
+                          | multiplicative_expression DIV unary_expression {
+                                    if(typecheck($1->loc->type, $3->arrBase->type)){
+                                        $$ = create_expression();
+                                        // t# = a/b; of type of a
+                                        $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
+                                        // emit the code for division
+                                        emit(OP_DIV, $$->loc->name, $1->loc->name, $3->arrBase->name);
+                                    }
+                                    else{
+                                        // conversion ???
+                                        yyerror("Type mismatch in multiplicative DIV expression\n");
+                                    }
+                                    printf("multiplicative-expression\n");
+                                }
+                          | multiplicative_expression MOD unary_expression {
+                                    if(typecheck($1->loc->type, $3->arrBase->type)){
+                                        $$ = create_expression();
+                                        // t# = a%b; of type of a
+                                        $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
+                                        // emit the code for modulus
+                                        emit(OP_MOD, $$->loc->name, $1->loc->name, $3->arrBase->name);  
+                                    }
+                                    else{
+                                        // conversion ???
+                                        yyerror("Type mismatch in multiplicative MOD expression\n");
+                                    }
+                                    printf("multiplicative-expression\n");
+                                }
                           ;
 
 additive_expression : multiplicative_expression {
                             $$ = $1;
                             printf("additive-expression\n");
                         }
-                    | additive_expression PLUS multiplicative_expression {printf("additive-expression\n");}
-                    | additive_expression MINUS multiplicative_expression {printf("additive-expression\n");}
+                    | additive_expression PLUS multiplicative_expression {
+                            if(typecheck($1->loc->type, $3->loc->type)){
+                                $$ = create_expression();
+                                // t# = a+b; of type of a
+                                $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
+                                // emit the code for addition
+                                emit(OP_PLUS, $$->loc->name, $1->loc->name, $3->loc->name);
+                            }
+                            else{
+                                // conversion ???
+                                yyerror("Type mismatch in additive PLUS expression\n");
+                            }
+                            printf("additive-expression\n");
+                        }
+                    | additive_expression MINUS multiplicative_expression {
+                            if(typecheck($1->loc->type, $3->loc->type)){
+                                $$ = create_expression();
+                                // t# = a-b; of type of a
+                                $$->loc = gentemp(create_symboltype($1->loc->type->type, 1, NULL), NULL);
+                                // emit the code for subtraction
+                                emit(OP_MINUS, $$->loc->name, $1->loc->name, $3->loc->name);
+                            }
+                            else{
+                                // conversion ???
+                                yyerror("Type mismatch in additive MINUS expression\n");
+                            }
+                            printf("additive-expression\n");
+                        }
                     ; 
 
 relational_expression : additive_expression {
@@ -450,7 +530,36 @@ direct_declarator : IDENTIFIER {
                             $$ = $1;
                             printf("direct-declarator\n");
                         }
-                  | IDENTIFIER L_PARENTHESIS parameter_list_opt R_PARENTHESIS {printf("direct-declarator\n");}
+                  | IDENTIFIER new_table L_PARENTHESIS parameter_list_opt R_PARENTHESIS {
+                            // this is where the function is defined and new symbol table is created for 
+                            // IDENTIFIER has parsed as a symbol table entry to the global symbol table
+                            update_type($1, create_symboltype(TYPE_FUNC, 1, NULL));
+                            $1->category = TYPE_FUNC;
+                            // create a new symbol table for the function
+                            currST->name = $1->name;
+                            // link the symbol table to the global symbol table
+                            $1->next = currST;
+                            // store return value
+                            enum symboltype_enum tempReturn = pop(&var_type);
+                            if(tempReturn == TYPE_VOID){
+                                currST->_retVal = create_symboltype(TYPE_VOID, 1, NULL);
+                            }
+                            else{
+                                symboltableentry* storeReturn = lookup(currST, "retValue");
+                                update_type(storeReturn, create_symboltype(tempReturn, 1, NULL));
+                                currST->_retVal = storeReturn->type;
+                            }
+                            // keep an instan
+                            // Reducing function name and parameter list to direct_declarator.
+                            // This will be reduced to type_specifier declarator {block_item_list_opt}.
+                            // need an instance of current symbol table for block_item_list_opt
+                            new_ST = currST;
+                            // printf("\n\nName %s\n\n",new_ST->name);
+                            currST = globalST;
+                            // printf("\n\nName %s\n\n",currST->name);
+                            $$ = $1;
+                            printf("direct-declarator\n");
+                        }
                   ;
 
 parameter_list_opt : parameter_list
@@ -467,11 +576,42 @@ parameter_list : parameter_declaration {printf("parameter-list\n");}
                | parameter_list COMMA parameter_declaration {printf("parameter-list\n");}
                ;
 
-parameter_declaration : type_specifier pointer_opt identifier_opt {printf("parameter-declaration\n");}
+parameter_declaration : type_specifier pointer_opt identifier_opt {
+                                if($2 != NULL && $3 != NULL){
+                                    $3 = lookup(currST, $3->name);
+                                    struct symboltype* tempType = create_symboltype(TYPE_PTR, 1, NULL);
+                                    tempType->ptr = create_symboltype(pop(&var_type), 1, NULL);
+                                    update_type($3, tempType);
+                                    $3->category = TYPE_PARAM;
+                                    // _argList PushBack ????
+                                    push_args(currST, $3);
+                                }
+                                else if($2 == NULL && $3 != NULL){
+                                    $3 = lookup(currST, $3->name);
+                                    update_type($3, create_symboltype(pop(&var_type), 1, NULL));
+                                    $3->category = TYPE_PARAM;
+                                    // _argList PushBack ????
+                                    push_args(currST, $3);
+                                }
+                                else if ($2 != NULL && $3 == NULL){
+                                    struct symboltype* tempType = create_symboltype(TYPE_PTR, 1, NULL);
+                                    tempType->ptr = create_symboltype(pop(&var_type), 1, NULL);
+                                    struct symboltableentry* tempPara = genparam(tempType, NULL);
+                                    update_type(tempPara, tempType);
+                                    // _argList PushBack ????
+                                    push_args(currST, tempPara);
+                                }
+                                else{
+                                    struct symboltableentry* tempPara = genparam(create_symboltype(pop(&var_type), 1, NULL), NULL);
+                                    // _argList PushBack ????
+                                    push_args(currST, tempPara);
+                                }
+                                printf("parameter-declaration\n");
+                            }
                       ;
 
-identifier_opt : IDENTIFIER
-               | 
+identifier_opt : IDENTIFIER {$$ = $1;}
+               | {$$ = NULL;}
                ;
 
 initializer : assignment_expression {
@@ -481,33 +621,80 @@ initializer : assignment_expression {
             ;
 
 /* STATEMENTS */
-statement : compound_statement {printf("statement\n");}
-          | expression_statement {printf("statement\n");}
-          | selection_statement {printf("statement\n");}
-          | iteration_statement {printf("statement\n");}
-          | jump_statement {printf("statement\n");}
+statement : compound_statement {
+                    // This is the Block. It contains a list of statements
+                    $$ = $1;
+                    printf("statement\n");
+                }
+          | expression_statement {
+                    // Expressions -- Assignment, Function Call, Operations, etc.
+                    $$ = create_statement();
+                    $$->nextList = $1->nextList;
+                    printf("statement\n");
+                }
+          | selection_statement {
+                    // If-Else, conditional
+                    $$ = $1;
+                    printf("statement\n");
+                }
+          | iteration_statement {
+                    // For Koop
+                    $$ = $1;
+                    printf("statement\n");
+                }
+          | jump_statement {
+                    // This is a return statement
+                    $$ = $1;
+                    printf("statement\n");
+                }
           ;
 
-compound_statement : L_CURLY_BRACE block_item_list_opt R_CURLY_BRACE {printf("compound-statement\n");}
+compound_statement : L_CURLY_BRACE block_item_list_opt R_CURLY_BRACE {
+                            $$ = $2;
+                            printf("compound-statement\n");
+                        }
                    ;
 
-block_item_list_opt : block_item_list
-                    | 
+block_item_list_opt : block_item_list {
+                            $$ = $1;
+                        }
+                    | {
+                            $$ = create_statement();
+                        }
                     ;
 
-block_item_list : block_item {printf("block-item-list\n");}
-                | block_item_list block_item {printf("block-item-list\n");}
+block_item_list : block_item {
+                        $$ = $1;
+                        printf("block-item-list\n");
+                    }
+                | block_item_list N block_item {
+                        $$ = $3;
+                        backpatch($1->nextList, $2);
+                        printf("block-item-list\n");
+                    }
                 ;   
 
-block_item : declaration {printf("block-item\n");}
-           | statement {printf("block-item\n");}
+block_item : declaration {
+                    $$ = create_statement();
+                    printf("block-item\n");
+                }
+           | statement {
+                    $$ = $1;
+                    printf("block-item\n");
+                }
            ;
 
-expression_statement : expression_opt SEMICOLON {printf("expression-statement\n");}
+expression_statement : expression_opt SEMICOLON {
+                            $$ = $1;
+                            printf("expression-statement\n");
+                        }
                      ;
 
-expression_opt : expression
-               |
+expression_opt : expression {$$ = $1;}
+               | {
+                    $$ = create_expression();
+                    $$->returnLabel = 1;
+                 }
                ;
 
 selection_statement : IF L_PARENTHESIS expression R_PARENTHESIS statement {printf("selection-statement\n");}
@@ -517,7 +704,31 @@ selection_statement : IF L_PARENTHESIS expression R_PARENTHESIS statement {print
 iteration_statement : FOR L_PARENTHESIS expression_opt SEMICOLON expression_opt SEMICOLON expression_opt R_PARENTHESIS statement {printf("iteration-statement\n");}
                     ;
 
-jump_statement : RETURN expression_opt SEMICOLON {printf("jump-statement\n");}
+jump_statement : RETURN expression_opt SEMICOLON {
+                        if($2->returnLabel == 1){
+                            // return statement without any expression
+                            // function return type is void -- check
+                            if(!typecheck(currST->_retVal, create_symboltype(TYPE_VOID, 1, NULL))){
+                                // return type mismatch
+                                yyerror("Return type mismatch with Function type\n");
+                            }
+                            $$ = create_statement();
+                            // emit the code for return
+                            emit(OP_RETURN, NULL, NULL, NULL);
+                        }
+                        else{
+                            // return statement with expression
+                            // check that the expression type is same as function return type
+                            if(!typecheck(currST->_retVal, $2->loc->type)){
+                                // return type mismatch
+                                yyerror("Return type mismatch with Function type\n");
+                            }
+                            $$ = create_statement();
+                            // emit the code for return
+                            emit(OP_RETURN, NULL, NULL, $2->loc->name);
+                        }
+                        printf("jump-statement\n");
+                    }
                ;
 
 /* TRANSLATION UNIT */
@@ -529,8 +740,33 @@ external_declaration : declaration {printf("external-declaration\n");}
                      | function_definition {printf("external-declaration\n");}
                      ;
 
-function_definition : type_specifier declarator compound_statement {printf("function-definition\n");}
+function_definition : type_specifier declarator switch_table compound_statement {
+                            // we have reduced function. Lose the instance of current symbol table
+                            new_ST = NULL;
+                            // emit the code for function definition
+
+                            // just to be safe, set the current symbol table to global symbol table
+                            currST = globalST;
+                            printf("function-definition\n");
+                        }
                     ;
+
+/* AUX RULES */
+new_table : {currST = create_symboltable("", globalST);}
+          ;
+
+N : {
+        // next instruction
+        $$ = nextInstr();
+        printf("next-instruction\n");
+    }
+  ;
+
+switch_table : {
+                    currST = new_ST;
+                    emit(OP_FUNC, NULL, NULL, currST->name);
+               }
+             ;
 
 %%
 /* C Code for functions */
