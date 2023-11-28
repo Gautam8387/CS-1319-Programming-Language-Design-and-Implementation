@@ -64,7 +64,8 @@ enum op_code{
     OP_PARAM,
     OP_CALL,
     OP_FUNC,
-    OP_LABEL
+    OP_LABEL,
+    OP_ENDFUNC
 };
 
 /**************************************************************************/
@@ -116,7 +117,7 @@ struct symboltable{            // Structure of a symbol table (TABLE)
     char* name;                // Name of symbol table
     struct symboltable* parent; // Pointer to parent symbol table
     int count;                 // Count of entries in symbol table
-    int tempCount;             // Count of temporary variables in symbol table
+    // int tempCount;             // Count of temporary variables in symbol table
     int paramCount;            // Count of parameters in symbol table
     symboltableentry** _argList; // List of arguments of function
     symboltableentry** table_entries;   // Pointer to entries in symbol table -- linked list of entries
@@ -183,14 +184,14 @@ void ll_delete(string_list* head);
 /*                        SYMBOL TABLE FUNCTIONS                          */
 /**************************************************************************/
 symboltableentry *lookup(symboltable* currST, char* yytext); // Lookup a symbol in the symbol table
+symboltableentry* parentLookup(symboltable* currST, char* yytext); // Lookup a symbol in the parent symbol table
 symboltable* create_symboltable(char* name, symboltable* parent); // Create a new symbol table
 symboltype* create_symboltype(enum symboltype_enum type, int width, symboltype* ptr); // Create a new symbol type
 symboltableentry* gentemp(symboltype* type, char* initial_value); // Generate a temporary variableint get_size(symboltype* type); // Get the width of a symbol
 symboltableentry* genparam(symboltype* type, char* initial_value); // Generate a parameter
 void update_type(symboltableentry* entry, symboltype* type); // Update the type of a symbol
-void update_table(symboltable* currST, symboltableentry* entry); // Update the symbol table
 void print_ST(symboltable *currST); // Print the symbol table
-void upddate_ST(symboltable* currST, symboltableentry* entry); // Update the symbol table
+void update_ST(symboltable* currST, symboltableentry* entry); // Update the symbol table
 char* printType(symboltype* type); // Print the type of a symbol
 char* printCategory(enum category_enum category); // Print the category of a symbol
 int typecheck(symboltype* type1, symboltype* type2); // Check if two types are equal

@@ -52,6 +52,7 @@ WHITESPACE              [ \t\n\r]
 {RETURN}                { return RETURN; }
 {VOID}                  { return VOID; }
 {IDENTIFIER}            { 
+                            // printf("\n\n IDENTIFIER: %s Going In Table %s\n\n", yytext, currST->name);
                             yylval.sym_entry = lookup(currST, yytext);
                             return IDENTIFIER; 
                         }

@@ -19,6 +19,7 @@ string_list* string_head;           // linked list for string literals
 symboltable* globalST;              // pointer to Global Symbol Table
 symboltable* currST;                // pointer to Current Symbol Table
 symboltable* new_ST;                // pointer to new Symbol Table  -- used in function declaration
+static int tempCount = 0;               // count of the temporary variables
 
 
 
@@ -242,22 +243,33 @@ int typecheck(symboltype* type1, symboltype* type2){
     }
 }
 
+
+// parent lookup -- lookup in the parent symbol table
+symboltableentry* parentLookup(symboltable* currST, char* yytext){
+    for(int i=0; i < currST->count; i++){ // for all the entries in the symbol table, check if the name matches
+        if(strcmp((currST->table_entries[i])->name, yytext) == 0){
+            return (currST->table_entries[i]); // return the entry if found
+        }
+    }
+    return NULL;
+}
 // lookup if entry exist, create if dont.
 symboltableentry *lookup(symboltable* currST, char* yytext){
-    // printf("Symbol LookUp in table, %s\n", currST->name);
+    // printf("\nSymbol %s LookUp in table, %s\n", yytext, currST->name);
     for(int i=0; i <currST->count; i++){ // for all the entries in the symbol table, check if the name matches
         if(strcmp((currST->table_entries[i])->name, yytext) == 0){
             return (currST->table_entries[i]); // return the entry if found
         }
     }
-    // printf("Symbol not found. Checking in parent table\n");
     // check if the entry is in the parent symbol table
     if(currST->parent != NULL){
-        if(lookup(currST->parent, yytext) != NULL){
-            return lookup(currST->parent, yytext);
+        // printf("Symbol not found. Checking in parent table \"%s\"\n", currST->parent->name);
+        symboltableentry* parentEntry = parentLookup(currST->parent, yytext);
+        if(parentEntry){
+            return parentEntry;
         }
     }
-    // printf("Symbol not found in parent table. Creating a new entry for \"%s\"\n", yytext);
+    // printf("\nSymbol not found in parent table. Creating a new entry for \"%s\" in %s\n", yytext, currST->name);
     // Create a new entry if not found
     symboltableentry* entry = (symboltableentry*)malloc(sizeof(symboltableentry));
     entry->name = strdup(yytext);
@@ -280,7 +292,7 @@ symboltable* create_symboltable(char* name, symboltable* parent){
     newST->name = name;
     newST->parent = parent;
     newST->count = 0;
-    newST->tempCount = 0;
+    // newST->tempCount = 0;
     newST->paramCount = 0;
     newST->_argList = NULL;
     newST->table_entries = NULL;
@@ -312,7 +324,7 @@ void update_type(symboltableentry* entry, symboltype* type){
 // the lookup function generates and stores the entry in currentST.
 symboltableentry* gentemp(symboltype* type, char* initial_value) {
     char tempName[20];
-    sprintf(tempName, "t%d", currST->tempCount++);
+    sprintf(tempName, "t%d", tempCount++);
     // Lookup or create a new entry for the temporary variable
     symboltableentry* tempEntry = lookup(currST, tempName);
     // Update type and initial value
@@ -353,7 +365,7 @@ void push_args(symboltable* currST, symboltableentry* arg){
 }
 
 // add a new entry to the symbol table
-void upddate_ST(symboltable* currST, symboltableentry* entry){
+void update_ST(symboltable* currST, symboltableentry* entry){
     currST->table_entries = (symboltableentry**)realloc(currST->table_entries, sizeof(symboltableentry)*(currST->count+1));
     currST->table_entries[currST->count] = entry;
     currST->count++;
@@ -515,6 +527,9 @@ void print_quad(quad* arr){
             break;
         case OP_LABEL:
             printf("%s:\n", arr->result);
+            break;
+        case OP_ENDFUNC:
+            printf("end %s\n", arr->result);
             break;
         default:
             printf("NULL\n");

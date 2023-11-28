@@ -534,12 +534,12 @@ direct_declarator : IDENTIFIER {
                   | IDENTIFIER new_table L_PARENTHESIS parameter_list_opt R_PARENTHESIS {
                             // this is where the function is defined and new symbol table is created for 
                             // IDENTIFIER has parsed as a symbol table entry to the global symbol table
-                            update_type($1, create_symboltype(TYPE_FUNC, 1, NULL));
-                            $1->category = TYPE_FUNC;
+                            // update_type($1, create_symboltype(TYPE_FUNC, 1, NULL));
+                            // $1->category = TYPE_FUNC;
                             // create a new symbol table for the function
-                            currST->name = $1->name;
+                            // currST->name = $1->name;
                             // link the symbol table to the global symbol table
-                            $1->next = currST;
+                            // $1->next = currST;
                             // store return value
                             enum symboltype_enum tempReturn = pop(&var_type);
                             if(tempReturn == TYPE_VOID){
@@ -745,7 +745,7 @@ function_definition : type_specifier declarator switch_table compound_statement 
                             // we have reduced function. Lose the instance of current symbol table
                             new_ST = NULL;
                             // emit the code for function definition
-
+                            emit(OP_ENDFUNC, NULL, NULL, currST->name);
                             // just to be safe, set the current symbol table to global symbol table
                             currST = globalST;
                             printf("function-definition\n");
@@ -753,19 +753,26 @@ function_definition : type_specifier declarator switch_table compound_statement 
                     ;
 
 /* AUX RULES */
-new_table : {currST = create_symboltable("", globalST);}
+new_table : {
+                struct symboltableentry* lastEntry = currST->table_entries[currST->count-1];
+                currST = create_symboltable(lastEntry->name, globalST);
+                update_type(lastEntry, create_symboltype(TYPE_FUNC, 1, NULL));
+                lastEntry->category = TYPE_FUNC;
+                lastEntry->next = currST;
+            }
           ;
 
 N : {
         // next instruction
         $$ = nextInstr();
-        printf("next-instruction\n");
+        //printf("next-instruction\n");
     }
   ;
 
 switch_table : {
                     currST = new_ST;
                     emit(OP_FUNC, NULL, NULL, currST->name);
+                    //printf("\n\nswitch-table\n\n");
                }
              ;
 
