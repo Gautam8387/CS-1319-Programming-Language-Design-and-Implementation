@@ -65,7 +65,8 @@ enum op_code{
     OP_CALL,
     OP_FUNC,
     OP_LABEL,
-    OP_ENDFUNC
+    OP_ENDFUNC,
+    OP_RETURN_VOID,
 };
 
 /**************************************************************************/
@@ -90,6 +91,7 @@ void print_quad(quad* q);              // Print a single quad
 void emit(enum op_code op, char* arg1, char* arg2, char* result);  // Emit a quad -- add to quadArray
 char* printOP(enum op_code op); // Print the operator
 int nextInstr(); // Get the next instruction number
+qArray* quadArray_initialize(qArray* head); // Initialize the quadArray
 
 
 /**************************************************************************/
@@ -149,9 +151,13 @@ struct statement{
 };
 typedef struct statement statement;
 
-expression* create_expression();
-statement* create_statement();
 void backpatch(int* list, int label); // Backpatch a list of labels with a label
+int* makelist(int label); // Make a list of labels
+int* merge(int* list1, int* list2); // Merge two lists of labels
+statement* create_statement();
+expression* create_expression();
+expression* bool2int(expression* e); // Convert a boolean expression to an integer expression
+expression* int2bool(expression* e); // Convert an integer expression to a boolean expression
 
 /**************************************************************************/
 /*                            VARIABLE STACK                              */
