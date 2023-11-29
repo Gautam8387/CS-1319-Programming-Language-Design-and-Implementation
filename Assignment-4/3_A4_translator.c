@@ -13,7 +13,7 @@ extern int yyparse(void);
 /**************************************************************************/
 /*                        GLOBAL VARIABLES                                */
 /**************************************************************************/
-qArray* quadArray = NULL;           // pointer to the head of the quad array linked list
+qArray* quadArray;           // pointer to the head of the quad array linked list
 var_type_stack var_type;            // declare the stack
 string_list* string_head;           // linked list for string literals
 symboltable* globalST;              // pointer to Global Symbol Table
@@ -37,7 +37,8 @@ expression* create_expression(){
     newExp->arrBase = NULL;
     newExp->trueList = NULL;
     newExp->falseList = NULL;
-    newExp->nextList = NULL;
+    newExp->nextList = (int*)malloc(sizeof(int));
+    newExp->nextList[0] = -1;
     newExp->returnLabel = 0;
     return newExp;
 }
@@ -59,7 +60,10 @@ void backpatch(int* list, int label){
     // printf("Backpatching\n");
     char str[50];
     sprintf(str, "%d", label);
-    // printf("Label: %s\n", str);
+    if (str==NULL){
+        str[0] = '0';
+    }
+    // printf("\n\nList[%d]: %d\n\n", i, list[i]);
     // list contains the list of labels to be backpatched
     int i=0;
     while(list[i] != -1){
@@ -76,6 +80,79 @@ void backpatch(int* list, int label){
         i++;
     }
     return;
+}
+
+// makelist
+int* makelist(int label){
+    int* list = (int*)malloc(2*sizeof(int));
+    list[0] = label;
+    list[1] = -1;
+    return list;
+}
+
+// merge
+int* merge(int* list1, int* list2){
+    // get lengths of both lists
+    int len1 = 0;
+    while(list1[len1] != -1){
+        len1++;
+    }
+    int len2 = 0;
+    while(list2[len2] != -1){
+        len2++;
+    }
+
+    // create a new list
+    int* merge = (int*)malloc((len1+len2+1)*sizeof(int));
+    int i=0;
+    while(list1[i] != -1){
+        merge[i] = list1[i];
+        i++;
+    }
+    int j=0;
+    while(list2[j] != -1){
+        merge[i] = list2[j];
+        i++;
+        j++;
+    }
+    merge[i] = -1;
+
+    return merge;
+}
+
+// Bool to Int
+expression* bool2int(expression* expr){
+    if(expr->isBool){
+        // generate a new temp 
+        expr->loc = gentemp(create_symboltype(TYPE_INT, 1, NULL), NULL);
+        // backpatch the true list with next instruction
+        backpatch(expr->trueList, nextInstr());
+        // emit the quad for true
+        emit(OP_ASSIGN, "true", NULL, expr->loc->name);
+        // goto the end of the false list
+        char str[100];
+        int pNext = nextInstr()+1;
+        sprintf(str, "%d", pNext);
+        emit(OP_GOTO, NULL, NULL, str);
+        // backpatch the false list with next instruction
+        backpatch(expr->falseList, nextInstr());
+        // emit the quad for false
+        emit(OP_ASSIGN, "false", NULL, expr->loc->name);
+    }
+    return expr;
+}
+
+// Int to Bool
+expression* int2bool(expression* expr){
+    if(!expr->isBool){
+        expr->falseList = makelist(nextInstr());
+        // emit == 0
+        emit(OP_EQUALS, expr->loc->name, "0", NULL);
+        expr->trueList = makelist(nextInstr());
+        // emit goto
+        emit(OP_GOTO, NULL, NULL, NULL);
+    }
+    return expr;
 }
 
 /**************************************************************************/
@@ -454,6 +531,7 @@ char* printOP(enum op_code op){
         case OP_BOX_ASSIGN:
             return "[]=";
         case OP_RETURN:
+        case OP_RETURN_VOID:
             return "return";
         case OP_PARAM:
             return "param";
@@ -516,6 +594,9 @@ void print_quad(quad* arr){
         case OP_RETURN:
             printf("return %s\n", arr->result);
             break;
+        case OP_RETURN_VOID:
+            printf("return\n");
+            break;
         case OP_PARAM:
             printf("param %s\n", arr->result);
             break;
@@ -542,6 +623,12 @@ void print_quadArray(qArray* head){
     printf("=============================================================================================================\n");
     printf("THREE ADDRESS CODE\n");
     printf("-------------------------------------------------------------------------------------------------------------\n");
+    // if empty
+    if(curr->arr == NULL){
+        printf("NULL\n");
+        printf("\n=============================================================================================================\n\n");
+        return;
+    }
     while(curr != NULL && curr->count != 0){
         printf("%d: ", curr->count);
         print_quad(curr->arr);
@@ -550,17 +637,24 @@ void print_quadArray(qArray* head){
     printf("\n=============================================================================================================\n\n");
 }
 
+// initilize quadArray
+qArray* quadArray_initialize(qArray* head){
+    head = (qArray*)malloc(sizeof(qArray));
+    head->arr = NULL;
+    head->count = 1;
+    head->nextQuad = NULL;
+    return head;
+}
+
 // Emit a quad -- add to quadArray
 void emit(enum op_code op, char* arg1, char* arg2, char* result){
     // initial case -- nextQuad is NULL
-    if(quadArray == NULL){
-        quadArray = (qArray*)malloc(sizeof(qArray));
+    if(quadArray->arr == NULL){
         quadArray->arr = (quad*)malloc(sizeof(quad));
         quadArray->arr->op = op;
         (arg1 == NULL)?(quadArray->arr->arg1 = NULL):(quadArray->arr->arg1 = strdup(arg1));
         (arg2 == NULL)?(quadArray->arr->arg2 = NULL):(quadArray->arr->arg2 = strdup(arg2));
         (result == NULL)?(quadArray->arr->result = NULL):(quadArray->arr->result = strdup(result));
-        quadArray->count = 1;
         quadArray->nextQuad = NULL;
         return;
     }
@@ -591,18 +685,7 @@ int nextInstr(){
 
 /*
 TODO:
-    - emit()                -- CHECK
-    - backpatch()           -- CHECK
-    - merge()
-    - makelist()
-    - Function Declaration      -- TABLE SWITCHING
-    - conditional statements
-*/
-
-/*
-Priority:
-    - fix emit()
-    - ST switch and store (maybe its print)
+    - FOR LOOP
 */
 
 int main(){
@@ -611,6 +694,7 @@ int main(){
     currST = globalST;
     stack_intialize(&var_type);
     string_head = string_list_initialize();
+    quadArray = quadArray_initialize(quadArray);
     // gentemp test
     // symboltableentry* temp = gentemp(create_symboltype(TYPE_INT, 1, NULL), "69");
     // gentemp update test
