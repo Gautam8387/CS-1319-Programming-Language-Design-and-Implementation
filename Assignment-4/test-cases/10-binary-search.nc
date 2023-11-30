@@ -9,13 +9,9 @@ char printStr(char *s){
     return *s;
 }
 
-/* Bubble Sort Algorithm in nanoC language.
-This is a test program for the lexer to tokenize.
-Group 03: julius-stabs-back
-Members: Gautam Ahuja, Nistha Singh
-*/
-
+// Program 10: Binary Search
 int arr[10]; // Sorted array to search
+
 // A recursive binary search function. It returns location of x
 // in given array arr[l..r] is present, otherwise -1
 int binarySearch(int l, int r, int x) {
@@ -33,6 +29,7 @@ int binarySearch(int l, int r, int x) {
     // We reach here when element is not present in array
     return -1;
 }
+
 int main() {
     int n = 5; // Number of elements
     arr[0] = 2;

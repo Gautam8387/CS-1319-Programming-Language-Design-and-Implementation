@@ -13,3 +13,6 @@ This assignment is to write a lexical analyzer for nanoC. The lexical analyzer i
 
 ## Assignment 3
 This assignment is to write a parser for nanoC. The parser is implemented using ```Bison```. Modified the lexer accordingly.
+
+## Assignment 4
+This assignment is to write a symbol table for nanoC. We also generate the intermediate (three address) code and Quads for nanoC. The symbol table and intermediate code is implemented using ```C```.
