@@ -26,7 +26,7 @@ static int tempCount = 0;               // count of the temporary variables
 /**************************************************************************/
 /*      Expression, Statement, and Function Structures                    */
 /**************************************************************************/
-// to create a new expression
+// to create a new expression -- all fields are initialized to NULL
 expression* create_expression(){
     expression* newExp = (expression*)malloc(sizeof(expression));
     newExp->isBool = false;
@@ -476,7 +476,7 @@ void print_ST(symboltable *currST){
         printf("%-15s", entry->name);
         printf("%-15s", printType(entry->type));
         printf("%-20s", printCategory(entry->category));
-        printf("%-20s", entry->initial_value);
+        (entry->initial_value) ? printf("%-20s", entry->initial_value) : printf("%-20s", "-");
         printf("%-15d", entry->size);
         // printf("%-15s", "-");
         if(entry->next != NULL){
@@ -702,11 +702,6 @@ int nextInstr(){
     }
     return curr->count+1;
 }
-
-/*
-TODO:
-    - FOR LOOP
-*/
 
 int main(){
     printf("Initializing Symbol Tables\n");
