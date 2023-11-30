@@ -101,23 +101,31 @@ int* merge(int* list1, int* list2){
     while(list2[len2] != -1){
         len2++;
     }
-
     // create a new list
-    int* merge = (int*)malloc((len1+len2+1)*sizeof(int));
+    int* newMerged = (int*)calloc((len1+len2+1), sizeof(int));
     int i=0;
     while(list1[i] != -1){
-        merge[i] = list1[i];
+        newMerged[i] = list1[i];
         i++;
     }
     int j=0;
     while(list2[j] != -1){
-        merge[i] = list2[j];
-        i++;
+        // Check if list2[j] is already in newMerged
+        int k;
+        for (k = 0; k < i; ++k) {
+            if (newMerged[k] == list2[j]) {
+                break;
+            }
+        }
+        // If list2[j] is not already in newMerged, add it
+        if (k == i) {
+            newMerged[i] = list2[j];
+            i++;
+        }
         j++;
     }
-    merge[i] = -1;
-
-    return merge;
+    newMerged[i] = -1;
+    return newMerged;
 }
 
 // Bool to Int
@@ -144,10 +152,11 @@ expression* bool2int(expression* expr){
 
 // Int to Bool
 expression* int2bool(expression* expr){
-    if(!expr->isBool){
+    if(expr->isBool == false){
         expr->falseList = makelist(nextInstr());
         // emit == 0
         emit(OP_EQUALS, expr->loc->name, "0", NULL);
+        // print_quadArray(quadArray);
         expr->trueList = makelist(nextInstr());
         // emit goto
         emit(OP_GOTO, NULL, NULL, NULL);
@@ -375,6 +384,7 @@ symboltable* create_symboltable(char* name, symboltable* parent){
     newST->table_entries = NULL;
     newST->_retVal = NULL;
     newST->next = NULL;
+    newST->returnLabel = 0;
     return newST;
 }
 
@@ -438,6 +448,12 @@ void push_args(symboltable* currST, symboltableentry* arg){
     }
     currST->_argList = (symboltableentry**)realloc(currST->_argList, sizeof(symboltableentry*)*(count+1));
     currST->_argList[count] = arg;
+    return;
+}
+
+// Update count of return label
+void update_return_ST(symboltable* currST, int update){
+    currST->returnLabel += update;
     return;
 }
 
@@ -604,7 +620,7 @@ void print_quad(quad* arr){
             printf("%s = call %s, %s\n", arr->result, arr->arg1, arr->arg2);
             break;
         case OP_FUNC:
-            printf("function %s\n", arr->result);
+            printf("function %s:\n", arr->result);
             break;
         case OP_LABEL:
             printf("%s:\n", arr->result);
