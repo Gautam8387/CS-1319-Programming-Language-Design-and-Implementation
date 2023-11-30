@@ -654,102 +654,101 @@ external-declaration
 translation-unit
 Global Symbol Table:
 =============================================================================================================
-Symbol Table: Global							 Parent: NULL
+Symbol Table: Global                              Parent: NULL
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-printInt	function	NULL		(null)		0	0	printInt
-readInt	function	NULL		(null)		0	0	readInt
-printStr	function	NULL		(null)		0	0	printStr
-swap	function	NULL		(null)		0	0	swap
-main	function	NULL		(null)		0	0	main
+printInt       function       NULL                (null)              0              0              printInt            
+readInt        function       NULL                (null)              0              0              readInt             
+printStr       function       NULL                (null)              0              0              printStr            
+swap           function       NULL                (null)              0              0              swap                
+main           function       NULL                (null)              0              0              main                
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printInt							 Parent: Global
+Symbol Table: printInt                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-x	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
+x              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: readInt							 Parent: Global
+Symbol Table: readInt                             Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	*int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t0	int	temp		(null)		4	0	NULL
+n              *int           param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t0             int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printStr							 Parent: Global
+Symbol Table: printStr                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-s	*char	param		(null)		4	0	NULL
-retValue	char	local		(null)		1	0	NULL
-t1	char	temp		(null)		1	0	NULL
+s              *char          param               (null)              4              0              NULL
+retValue       char           local               (null)              1              0              NULL
+t1             char           temp                (null)              1              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: swap							 Parent: Global
+Symbol Table: swap                                Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-p	*int	param		(null)		4	0	NULL
-q	*int	param		(null)		4	0	NULL
-t	int	local		(null)		4	0	NULL
-t26	int	temp		(null)		4	0	NULL
-t27	int	temp		(null)		4	0	NULL
-t28	int	temp		(null)		4	0	NULL
-t29	int	temp		(null)		4	0	NULL
-
-=============================================================================================================
+p              *int           param               (null)              4              0              NULL
+q              *int           param               (null)              4              0              NULL
+t              int            local               (null)              4              0              NULL
+t25            int            temp                (null)              4              0              NULL
+t26            int            temp                (null)              4              0              NULL
+t27            int            temp                (null)              4              0              NULL
+t28            int            temp                (null)              4              0              NULL
 
 =============================================================================================================
-Symbol Table: main							 Parent: Global
+
+=============================================================================================================
+Symbol Table: main                                Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-retValue	int	local		(null)		4	0	NULL
-x	int	local		(null)		4	0	NULL
-y	int	local		(null)		4	0	NULL
-t2	*int	temp		(null)		4	0	NULL
-t3	int	temp		(null)		4	0	NULL
-t4	*int	temp		(null)		4	0	NULL
-t5	int	temp		(null)		4	0	NULL
-t6	*char	temp		"Before swap:\n"		4	0	NULL
-t7	char	temp		(null)		1	0	NULL
-t8	*char	temp		"x = "		4	0	NULL
-t9	char	temp		(null)		1	0	NULL
-t10	int	temp		(null)		4	0	NULL
-t11	*char	temp		" y = "		4	0	NULL
-t12	char	temp		(null)		1	0	NULL
-t13	int	temp		(null)		4	0	NULL
-t14	*int	temp		(null)		4	0	NULL
-t15	*int	temp		(null)		4	0	NULL
-t16	void	temp		(null)		0	0	NULL
-t17	*char	temp		"\nAfter swap:\n"		4	0	NULL
-t18	char	temp		(null)		1	0	NULL
-t19	*char	temp		"x = "		4	0	NULL
-t20	char	temp		(null)		1	0	NULL
-t21	int	temp		(null)		4	0	NULL
-t22	*char	temp		" y = "		4	0	NULL
-t23	char	temp		(null)		1	0	NULL
-t24	int	temp		(null)		4	0	NULL
-t25	int	temp		0		4	0	NULL
+retValue       int            local               (null)              4              0              NULL
+x              int            local               (null)              4              0              NULL
+y              int            local               (null)              4              0              NULL
+t2             *int           temp                (null)              4              0              NULL
+t3             int            temp                (null)              4              0              NULL
+t4             *int           temp                (null)              4              0              NULL
+t5             int            temp                (null)              4              0              NULL
+t6             *char          temp                "Before swap:\n"    4              0              NULL
+t7             char           temp                (null)              1              0              NULL
+t8             *char          temp                "x = "              4              0              NULL
+t9             char           temp                (null)              1              0              NULL
+t10            int            temp                (null)              4              0              NULL
+t11            *char          temp                " y = "             4              0              NULL
+t12            char           temp                (null)              1              0              NULL
+t13            int            temp                (null)              4              0              NULL
+t14            *int           temp                (null)              4              0              NULL
+t15            *int           temp                (null)              4              0              NULL
+t16            *char          temp                "\nAfter swap:\n"   4              0              NULL
+t17            char           temp                (null)              1              0              NULL
+t18            *char          temp                "x = "              4              0              NULL
+t19            char           temp                (null)              1              0              NULL
+t20            int            temp                (null)              4              0              NULL
+t21            *char          temp                " y = "             4              0              NULL
+t22            char           temp                (null)              1              0              NULL
+t23            int            temp                (null)              4              0              NULL
+t24            int            temp                0                   4              0              NULL
 
 =============================================================================================================
 
@@ -794,30 +793,30 @@ THREE ADDRESS CODE
 33: param t14
 34: t15 = &y
 35: param t15
-36: t16 = call swap, 2
-37: t17 = string("\nAfter swap:\n")
-38: param t17
-39: t18 = call printStr, 1
-40: t19 = string("x = ")
-41: param t19
-42: t20 = call printStr, 1
+36: call swap, 2
+37: t16 = string("\nAfter swap:\n")
+38: param t16
+39: t17 = call printStr, 1
+40: t18 = string("x = ")
+41: param t18
+42: t19 = call printStr, 1
 43: param x
-44: t21 = call printInt, 1
-45: t22 = string(" y = ")
-46: param t22
-47: t23 = call printStr, 1
+44: t20 = call printInt, 1
+45: t21 = string(" y = ")
+46: param t21
+47: t22 = call printStr, 1
 48: param y
-49: t24 = call printInt, 1
-50: t25 = 0
-51: return t25
+49: t23 = call printInt, 1
+50: t24 = 0
+51: return t24
 52: end main
 53: function swap:
-54: t26 = *p
-55: t = t26
-56: t27 = *p
-57: t28 = *q
-58: *p = t28
-59: t29 = *q
+54: t25 = *p
+55: t = t25
+56: t26 = *p
+57: t27 = *q
+58: *p = t27
+59: t28 = *q
 60: *q = t
 61: return
 62: end swap

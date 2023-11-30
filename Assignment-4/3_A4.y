@@ -172,13 +172,21 @@ postfix_expression : primary_expression {
                             if($1->loc->next != NULL){
                                 // generate temp of type of return value of function.
                                 // f# = call function, para#
-                                $$->loc = gentemp($1->loc->next->_retVal, NULL);
-                                $$->arrBase = $$->loc;
-                                // emit the code for function call. Paramter count is in argument_expression_list_opt
-                                // convert $3 to string
-                                char intTOstr[10];
-                                sprintf(intTOstr, "%d", $3);
-                                emit(OP_CALL, $1->loc->name, intTOstr, $$->loc->name);
+                                if($1->loc->next->_retVal->type != TYPE_VOID){
+                                    $$->loc = gentemp($1->loc->next->_retVal, NULL);
+                                    $$->arrBase = $$->loc;
+                                    // emit the code for function call. Paramter count is in argument_expression_list_opt
+                                    // convert $3 to string
+                                    char intTOstr[10];
+                                    sprintf(intTOstr, "%d", $3);
+                                    emit(OP_CALL, $1->loc->name, intTOstr, $$->loc->name);
+                                }
+                                else{
+                                    // void type call, no assign
+                                    char intTOstr[10];
+                                    sprintf(intTOstr, "%d", $3);
+                                    emit(OP_CALL_VOID, $1->loc->name, intTOstr, NULL);
+                                }
                             }
                             // function not defined
                             else{
@@ -231,18 +239,23 @@ unary_expression : postfix_expression {
                         
                         // check the unary_operator type
                         if(strcmp($1, "&") == 0){
+                            int temp = 0;
+                            /*
                             if($2->isArray){
                                 // first get arr[i] and then &arr[i]
-                                $$->loc = gentemp($2->loc->type, NULL);
+                                // printf("\n\n RUNNN \n\n");
+                                $$->loc = gentemp(create_symboltype(TYPE_PTR, 1, $2->loc->type), NULL);
                                 emit(OP_ASSIGN_BOX, $2->arrBase->name, $2->loc->name, $$->loc->name);
                                 $$->isPtr = true;
+                                temp++;
                             }
+                            */
                             // an operator is refering to a variable address. It has to be a pointer
                             // struct symboltype* temp = create_symboltype(TYPE_PTR, 1, NULL);
                             $$->arrBase = gentemp(create_symboltype(TYPE_PTR, 1, NULL), NULL);
                             $$->arrBase->type->ptr = $2->arrBase->type;
                             // emit the code for refering
-                            emit(OP_ASSIGN_AMPER, $2->arrBase->name, NULL, $$->arrBase->name);
+                            (temp > 0) ? emit(OP_ASSIGN_AMPER, $$->loc->name, NULL, $$->arrBase->name) : emit(OP_ASSIGN_AMPER, $2->arrBase->name, NULL, $$->arrBase->name);
                         }
 
                         else if(strcmp($1, "*") == 0){
@@ -310,11 +323,11 @@ unary_operator : AMPERSAND {
                ;
 
 multiplicative_expression : unary_expression {
-                                    struct expression* temp = create_expression();
+                                    $$ = create_expression();
                                     // check if the expression is a pointer
                                     if($1->isPtr){
                                         // copy the loation of expression to temp
-                                        temp->loc = $1->loc;
+                                        $$->loc = $1->loc;
                                     } else if($1->isArray){    // check if array
                                         // new temporary entry for array in current symbol table
                                         $$->loc = gentemp($1->loc->type, $1->loc->initial_value);
@@ -599,6 +612,10 @@ assignment_expression : conditional_expression {
                                     emit(OP_ASTERISK_ASSIGN, $3->loc->name, NULL, $1->arrBase->name);
                                 }
                                 else{
+                                    // chek both type
+                                    if(!typecheck($1->loc->type, $3->loc->type)){
+                                        yyerror("Type mismatch in assignment expression");
+                                    }
                                     emit(OP_ASSIGN, $3->loc->name, NULL, $1->arrBase->name);
                                 }
                                 $$ = $3;
@@ -664,6 +681,11 @@ declarator : pointer_opt direct_declarator {
                         if($2->next == NULL){
                             // it is an Array
                             temp->ptr = $2->type;
+                            /*
+                            if ($2->type->type == TYPE_ARRAY){
+                                printf("\n TYPE %d and %d and %d\n", temp->type, temp->ptr->type, temp->ptr->ptr->type);
+                            }
+                            */
                             update_type($2, temp);
                         }
                         else{
@@ -695,6 +717,7 @@ direct_declarator : IDENTIFIER {
                             update_type($1, create_symboltype(pop(&var_type), 1, NULL));
                             // set array flag
                             update_type($1, create_symboltype(TYPE_ARRAY, atoi($3), $1->type));
+                            // printf("\nNAME %s and WIDTH %d\n", $1->name, $1->type->width);
                             $$ = $1;
                             printf("direct-declarator\n");
                         }

@@ -77,7 +77,7 @@ void backpatch(int* list, int label){
         // update the result
         curr->arr->result = strdup(str);
         // printf("Updated result: %s\n", curr->arr->result);
-        i++;
+        i=i+1;
     }
     return;
 }
@@ -465,36 +465,36 @@ void update_ST(symboltable* currST, symboltableentry* entry){
     return;
 }
 
-// Print the symbol table
 void print_ST(symboltable *currST){
-    printf("=============================================================================================================\n");
-    (currST->parent)?printf("Symbol Table: %s\t\t\t\t\t\t\t Parent: %s\n\n", currST->name, currST->parent->name):printf("Symbol Table: %s\t\t\t\t\t\t\t Parent: NULL\n", currST->name);
-    // lines
-    printf("-------------------------------------------------------------------------------------------------------------\n");
-    printf("Name\tType\tCategory\tInitial Value\tSize\tOffset\tNested Table\n");
-    printf("-------------------------------------------------------------------------------------------------------------\n");
+    printf("\n\n==================================================================================================================\n");
+    (currST->parent) ? printf("Symbol Table: %-50s Parent: ST.%s\n", currST->name, currST->parent->name) : printf("Symbol Table: %-35s Parent: NULL\n", currST->name);
+    printf("------------------------------------------------------------------------------------------------------------------\n");
+    printf("%-15s%-15s%-20s%-20s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Nested Table");
+    printf("------------------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
-        printf("%s\t", entry->name);
-        printf("%s\t", printType(entry->type));
-        printf("%s\t\t", printCategory(entry->category));
-        printf("%s\t\t", entry->initial_value);
-        printf("%d\t", entry->size);
-        printf("%d\t", entry->offset);
+        printf("%-15s", entry->name);
+        printf("%-15s", printType(entry->type));
+        printf("%-20s", printCategory(entry->category));
+        printf("%-20s", entry->initial_value);
+        printf("%-15d", entry->size);
+        // printf("%-15s", "-");
         if(entry->next != NULL){
-            printf("%s\n", entry->next->name);
+            printf("%-20s\n", entry->next->name);
         }
         else{
-            printf("NULL\n");
+            printf("-\n");
         }
     }
-    printf("\n");
-    printf("=============================================================================================================\n\n");
+    // printf("\n");
+    printf("==================================================================================================================\n");
+
     // print the nested symbol tables
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
         if(entry->next != NULL && entry->category == TYPE_FUNC){
             print_ST(entry->next);
+            printf("\n");
         }
     }
 }
@@ -552,6 +552,7 @@ char* printOP(enum op_code op){
         case OP_PARAM:
             return "param";
         case OP_CALL:
+        case OP_CALL_VOID:
             return "call";
         case OP_FUNC:
             return "function";
@@ -618,6 +619,9 @@ void print_quad(quad* arr){
             break;
         case OP_CALL:
             printf("%s = call %s, %s\n", arr->result, arr->arg1, arr->arg2);
+            break;
+        case OP_CALL_VOID:
+            printf("call %s, %s\n", arr->arg1, arr->arg2);
             break;
         case OP_FUNC:
             printf("function %s:\n", arr->result);

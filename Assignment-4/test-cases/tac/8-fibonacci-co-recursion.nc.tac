@@ -645,132 +645,132 @@ external-declaration
 translation-unit
 Global Symbol Table:
 =============================================================================================================
-Symbol Table: Global							 Parent: NULL
+Symbol Table: Global                              Parent: NULL
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-printInt	function	NULL		(null)		0	0	printInt
-readInt	function	NULL		(null)		0	0	readInt
-printStr	function	NULL		(null)		0	0	printStr
-f_odd	function	NULL		(null)		0	0	f_odd
-f_even	function	NULL		(null)		0	0	f_even
-fibonacci	function	NULL		(null)		0	0	fibonacci
-main	function	NULL		(null)		0	0	main
+printInt       function       NULL                (null)              0              0              printInt            
+readInt        function       NULL                (null)              0              0              readInt             
+printStr       function       NULL                (null)              0              0              printStr            
+f_odd          function       NULL                (null)              0              0              f_odd               
+f_even         function       NULL                (null)              0              0              f_even              
+fibonacci      function       NULL                (null)              0              0              fibonacci           
+main           function       NULL                (null)              0              0              main                
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printInt							 Parent: Global
+Symbol Table: printInt                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-x	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
+x              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: readInt							 Parent: Global
+Symbol Table: readInt                             Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	*int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t0	int	temp		(null)		4	0	NULL
+n              *int           param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t0             int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printStr							 Parent: Global
+Symbol Table: printStr                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-s	*char	param		(null)		4	0	NULL
-retValue	char	local		(null)		1	0	NULL
-t1	char	temp		(null)		1	0	NULL
+s              *char          param               (null)              4              0              NULL
+retValue       char           local               (null)              1              0              NULL
+t1             char           temp                (null)              1              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: f_odd							 Parent: Global
+Symbol Table: f_odd                               Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t8	int	temp		1		4	0	NULL
-t9	int	temp		1		4	0	NULL
-t10	int	temp		1		4	0	NULL
-t11	int	temp		(null)		4	0	NULL
-t12	int	temp		(null)		4	0	NULL
-t13	int	temp		2		4	0	NULL
-t14	int	temp		(null)		4	0	NULL
-t15	int	temp		(null)		4	0	NULL
-t16	int	temp		(null)		4	0	NULL
-t17	int	temp		(null)		4	0	NULL
+n              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t8             int            temp                1                   4              0              NULL
+t9             int            temp                1                   4              0              NULL
+t10            int            temp                1                   4              0              NULL
+t11            int            temp                (null)              4              0              NULL
+t12            int            temp                (null)              4              0              NULL
+t13            int            temp                2                   4              0              NULL
+t14            int            temp                (null)              4              0              NULL
+t15            int            temp                (null)              4              0              NULL
+t16            int            temp                (null)              4              0              NULL
+t17            int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: f_even							 Parent: Global
+Symbol Table: f_even                              Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t18	int	temp		0		4	0	NULL
-t19	int	temp		0		4	0	NULL
-t20	int	temp		1		4	0	NULL
-t21	int	temp		(null)		4	0	NULL
-t22	int	temp		(null)		4	0	NULL
-t23	int	temp		2		4	0	NULL
-t24	int	temp		(null)		4	0	NULL
-t25	int	temp		(null)		4	0	NULL
-t26	int	temp		(null)		4	0	NULL
-t27	int	temp		(null)		4	0	NULL
+n              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t18            int            temp                0                   4              0              NULL
+t19            int            temp                0                   4              0              NULL
+t20            int            temp                1                   4              0              NULL
+t21            int            temp                (null)              4              0              NULL
+t22            int            temp                (null)              4              0              NULL
+t23            int            temp                2                   4              0              NULL
+t24            int            temp                (null)              4              0              NULL
+t25            int            temp                (null)              4              0              NULL
+t26            int            temp                (null)              4              0              NULL
+t27            int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: fibonacci							 Parent: Global
+Symbol Table: fibonacci                           Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t2	int	temp		2		4	0	NULL
-t3	int	temp		(null)		4	0	NULL
-t4	int	temp		0		4	0	NULL
-t5	int	temp		(null)		4	0	NULL
-t6	int	temp		(null)		4	0	NULL
-t7	int	temp		(null)		4	0	NULL
-
-=============================================================================================================
+n              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t2             int            temp                2                   4              0              NULL
+t3             int            temp                (null)              4              0              NULL
+t4             int            temp                0                   4              0              NULL
+t5             int            temp                (null)              4              0              NULL
+t6             int            temp                (null)              4              0              NULL
+t7             int            temp                (null)              4              0              NULL
 
 =============================================================================================================
-Symbol Table: main							 Parent: Global
+
+=============================================================================================================
+Symbol Table: main                                Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-retValue	int	local		(null)		4	0	NULL
-n	int	local		10		4	0	NULL
-t28	int	temp		10		4	0	NULL
-r	int	local		(null)		4	0	NULL
-t29	int	temp		(null)		4	0	NULL
-t30	*char	temp		"fibo("		4	0	NULL
-t31	char	temp		(null)		1	0	NULL
-t32	int	temp		(null)		4	0	NULL
-t33	*char	temp		") = "		4	0	NULL
-t34	char	temp		(null)		1	0	NULL
-t35	int	temp		(null)		4	0	NULL
-t36	int	temp		0		4	0	NULL
+retValue       int            local               (null)              4              0              NULL
+n              int            local               10                  4              0              NULL
+t28            int            temp                10                  4              0              NULL
+r              int            local               (null)              4              0              NULL
+t29            int            temp                (null)              4              0              NULL
+t30            *char          temp                "fibo("             4              0              NULL
+t31            char           temp                (null)              1              0              NULL
+t32            int            temp                (null)              4              0              NULL
+t33            *char          temp                ") = "              4              0              NULL
+t34            char           temp                (null)              1              0              NULL
+t35            int            temp                (null)              4              0              NULL
+t36            int            temp                0                   4              0              NULL
 
 =============================================================================================================
 

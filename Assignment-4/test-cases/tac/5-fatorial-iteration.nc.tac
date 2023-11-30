@@ -369,75 +369,75 @@ external-declaration
 translation-unit
 Global Symbol Table:
 =============================================================================================================
-Symbol Table: Global							 Parent: NULL
+Symbol Table: Global                              Parent: NULL
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-printInt	function	NULL		(null)		0	0	printInt
-readInt	function	NULL		(null)		0	0	readInt
-printStr	function	NULL		(null)		0	0	printStr
-main	function	NULL		(null)		0	0	main
+printInt       function       NULL                (null)              0              0              printInt            
+readInt        function       NULL                (null)              0              0              readInt             
+printStr       function       NULL                (null)              0              0              printStr            
+main           function       NULL                (null)              0              0              main                
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printInt							 Parent: Global
+Symbol Table: printInt                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-x	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
+x              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: readInt							 Parent: Global
+Symbol Table: readInt                             Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	*int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t0	int	temp		(null)		4	0	NULL
+n              *int           param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t0             int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printStr							 Parent: Global
+Symbol Table: printStr                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-s	*char	param		(null)		4	0	NULL
-retValue	char	local		(null)		1	0	NULL
-t1	char	temp		(null)		1	0	NULL
-
-=============================================================================================================
+s              *char          param               (null)              4              0              NULL
+retValue       char           local               (null)              1              0              NULL
+t1             char           temp                (null)              1              0              NULL
 
 =============================================================================================================
-Symbol Table: main							 Parent: Global
+
+=============================================================================================================
+Symbol Table: main                                Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-retValue	int	local		(null)		4	0	NULL
-n	int	local		(null)		4	0	NULL
-i	int	local		0		4	0	NULL
-t2	int	temp		0		4	0	NULL
-r	int	local		1		4	0	NULL
-t3	int	temp		1		4	0	NULL
-t4	*int	temp		(null)		4	0	NULL
-t5	int	temp		(null)		4	0	NULL
-t6	int	temp		1		4	0	NULL
-t7	int	temp		1		4	0	NULL
-t8	int	temp		(null)		4	0	NULL
-t9	int	temp		(null)		4	0	NULL
-t10	int	temp		(null)		4	0	NULL
-t11	*char	temp		"! = "		4	0	NULL
-t12	char	temp		(null)		1	0	NULL
-t13	int	temp		(null)		4	0	NULL
-t14	int	temp		0		4	0	NULL
+retValue       int            local               (null)              4              0              NULL
+n              int            local               (null)              4              0              NULL
+i              int            local               0                   4              0              NULL
+t2             int            temp                0                   4              0              NULL
+r              int            local               1                   4              0              NULL
+t3             int            temp                1                   4              0              NULL
+t4             *int           temp                (null)              4              0              NULL
+t5             int            temp                (null)              4              0              NULL
+t6             int            temp                1                   4              0              NULL
+t7             int            temp                1                   4              0              NULL
+t8             int            temp                (null)              4              0              NULL
+t9             int            temp                (null)              4              0              NULL
+t10            int            temp                (null)              4              0              NULL
+t11            *char          temp                "! = "              4              0              NULL
+t12            char           temp                (null)              1              0              NULL
+t13            int            temp                (null)              4              0              NULL
+t14            int            temp                0                   4              0              NULL
 
 =============================================================================================================
 

@@ -826,116 +826,116 @@ external-declaration
 translation-unit
 Global Symbol Table:
 =============================================================================================================
-Symbol Table: Global							 Parent: NULL
+Symbol Table: Global                              Parent: NULL
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-printInt	function	NULL		(null)		0	0	printInt
-readInt	function	NULL		(null)		0	0	readInt
-printStr	function	NULL		(null)		0	0	printStr
-arr	array(10,int)	global		0		40	0	NULL
-binarySearch	function	NULL		(null)		0	0	binarySearch
-main	function	NULL		(null)		0	0	main
+printInt       function       NULL                (null)              0              0              printInt            
+readInt        function       NULL                (null)              0              0              readInt             
+printStr       function       NULL                (null)              0              0              printStr            
+arr            array(10,int)  global              0                   40             0              NULL
+binarySearch   function       NULL                (null)              0              0              binarySearch        
+main           function       NULL                (null)              0              0              main                
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printInt							 Parent: Global
+Symbol Table: printInt                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-x	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
+x              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: readInt							 Parent: Global
+Symbol Table: readInt                             Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-n	*int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-t0	int	temp		(null)		4	0	NULL
+n              *int           param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+t0             int            temp                (null)              4              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: printStr							 Parent: Global
+Symbol Table: printStr                            Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-s	*char	param		(null)		4	0	NULL
-retValue	char	local		(null)		1	0	NULL
-t1	char	temp		(null)		1	0	NULL
+s              *char          param               (null)              4              0              NULL
+retValue       char           local               (null)              1              0              NULL
+t1             char           temp                (null)              1              0              NULL
 
 =============================================================================================================
 
 =============================================================================================================
-Symbol Table: binarySearch							 Parent: Global
+Symbol Table: binarySearch                        Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-l	int	param		(null)		4	0	NULL
-r	int	param		(null)		4	0	NULL
-x	int	param		(null)		4	0	NULL
-retValue	int	local		(null)		4	0	NULL
-mid	int	local		(null)		4	0	NULL
-t2	int	temp		(null)		4	0	NULL
-t3	int	temp		2		4	0	NULL
-t4	int	temp		(null)		4	0	NULL
-t5	int	temp		(null)		4	0	NULL
-t6	int	temp		(null)		4	0	NULL
-t7	int	temp		(null)		4	0	NULL
-t8	int	temp		1		4	0	NULL
-t9	int	temp		(null)		4	0	NULL
-t10	int	temp		(null)		4	0	NULL
-t11	int	temp		1		4	0	NULL
-t12	int	temp		(null)		4	0	NULL
-t13	int	temp		(null)		4	0	NULL
-t14	int	temp		1		4	0	NULL
-t15	int	temp		(null)		4	0	NULL
-
-=============================================================================================================
+l              int            param               (null)              4              0              NULL
+r              int            param               (null)              4              0              NULL
+x              int            param               (null)              4              0              NULL
+retValue       int            local               (null)              4              0              NULL
+mid            int            local               (null)              4              0              NULL
+t2             int            temp                (null)              4              0              NULL
+t3             int            temp                2                   4              0              NULL
+t4             int            temp                (null)              4              0              NULL
+t5             int            temp                (null)              4              0              NULL
+t6             int            temp                (null)              4              0              NULL
+t7             int            temp                (null)              4              0              NULL
+t8             int            temp                1                   4              0              NULL
+t9             int            temp                (null)              4              0              NULL
+t10            int            temp                (null)              4              0              NULL
+t11            int            temp                1                   4              0              NULL
+t12            int            temp                (null)              4              0              NULL
+t13            int            temp                (null)              4              0              NULL
+t14            int            temp                1                   4              0              NULL
+t15            int            temp                (null)              4              0              NULL
 
 =============================================================================================================
-Symbol Table: main							 Parent: Global
+
+=============================================================================================================
+Symbol Table: main                                Parent: Global
 
 -------------------------------------------------------------------------------------------------------------
-Name	Type	Category	Initial Value	Size	Offset	Nested Table
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 -------------------------------------------------------------------------------------------------------------
-retValue	int	local		(null)		4	0	NULL
-n	int	local		5		4	0	NULL
-t16	int	temp		5		4	0	NULL
-t17	int	temp		0		4	0	NULL
-t18	int	temp		2		4	0	NULL
-t19	int	temp		1		4	0	NULL
-t20	int	temp		3		4	0	NULL
-t21	int	temp		2		4	0	NULL
-t22	int	temp		4		4	0	NULL
-t23	int	temp		3		4	0	NULL
-t24	int	temp		10		4	0	NULL
-t25	int	temp		4		4	0	NULL
-t26	int	temp		40		4	0	NULL
-x	int	local		10		4	0	NULL
-t27	int	temp		10		4	0	NULL
-result	int	local		(null)		4	0	NULL
-t28	int	temp		0		4	0	NULL
-t29	int	temp		1		4	0	NULL
-t30	int	temp		(null)		4	0	NULL
-t31	int	temp		(null)		4	0	NULL
-t32	int	temp		1		4	0	NULL
-t33	int	temp		(null)		4	0	NULL
-t34	*char	temp		"Element is not present in array"		4	0	NULL
-t35	char	temp		(null)		1	0	NULL
-t36	*char	temp		"Element is present at index "		4	0	NULL
-t37	char	temp		(null)		1	0	NULL
-t38	int	temp		(null)		4	0	NULL
-t39	int	temp		0		4	0	NULL
+retValue       int            local               (null)              4              0              NULL
+n              int            local               5                   4              0              NULL
+t16            int            temp                5                   4              0              NULL
+t17            int            temp                0                   4              0              NULL
+t18            int            temp                2                   4              0              NULL
+t19            int            temp                1                   4              0              NULL
+t20            int            temp                3                   4              0              NULL
+t21            int            temp                2                   4              0              NULL
+t22            int            temp                4                   4              0              NULL
+t23            int            temp                3                   4              0              NULL
+t24            int            temp                10                  4              0              NULL
+t25            int            temp                4                   4              0              NULL
+t26            int            temp                40                  4              0              NULL
+x              int            local               10                  4              0              NULL
+t27            int            temp                10                  4              0              NULL
+result         int            local               (null)              4              0              NULL
+t28            int            temp                0                   4              0              NULL
+t29            int            temp                1                   4              0              NULL
+t30            int            temp                (null)              4              0              NULL
+t31            int            temp                (null)              4              0              NULL
+t32            int            temp                1                   4              0              NULL
+t33            int            temp                (null)              4              0              NULL
+t34            *char          temp                "Element is not present in array"4              0              NULL
+t35            char           temp                (null)              1              0              NULL
+t36            *char          temp                "Element is present at index "4              0              NULL
+t37            char           temp                (null)              1              0              NULL
+t38            int            temp                (null)              4              0              NULL
+t39            int            temp                0                   4              0              NULL
 
 =============================================================================================================
 
@@ -965,13 +965,13 @@ THREE ADDRESS CODE
 18: t4 = t2 / t3
 19: t5 = l + t4
 20: mid = t5
-21: t6 = arr[t6]
+21: t6 = arr[mid]
 22: if t6 == x goto 25
 23: goto 27
 24: goto 27
 25: return mid
 26: goto 27
-27: t7 = arr[t7]
+27: t7 = arr[mid]
 28: if t7 > x goto 31
 29: goto 39
 30: goto 39

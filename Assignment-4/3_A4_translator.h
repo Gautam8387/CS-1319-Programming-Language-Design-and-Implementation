@@ -64,6 +64,7 @@ enum op_code{
     OP_RETURN,
     OP_PARAM,
     OP_CALL,
+    OP_CALL_VOID,
     OP_FUNC,
     OP_LABEL,
     OP_ENDFUNC,
@@ -104,7 +105,7 @@ struct symboltype{
     struct symboltype* ptr;    // Pointer to type of symbol (for TYPE_PTR)
 };
 typedef struct symboltype symboltype;
-
+// Name           Type           Category            Initial Value       Size           Nested Table
 struct symboltableentry{       // Structure of a symbol table entry (ROW) for variables
     char* name;                // Name of symbol
     symboltype* type;          // Type of symbol
