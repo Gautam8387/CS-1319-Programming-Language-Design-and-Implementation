@@ -29,7 +29,8 @@ enum symboltype_enum {
     TYPE_PTR,
     TYPE_FUNC,
     TYPE_ARRAY,
-    TYPE_STRING
+    TYPE_STRING,
+    TYPE_BLOCK
 };
 
 enum category_enum {
@@ -125,6 +126,7 @@ struct symboltable{            // Structure of a symbol table (TABLE)
     symboltableentry** table_entries;   // Pointer to entries in symbol table -- linked list of entries
     symboltype* _retVal;        // Return type of function
     struct symboltable* next;         // Pointer to next symbol table
+    int returnLabel;           // Return label
 };
 typedef struct symboltable symboltable;
 
@@ -148,6 +150,7 @@ typedef struct expression expression;
 struct statement{
     int* nextList;         // List of next labels
     int returnLabel;       // Return label
+    enum symboltype_enum Type; // Does statement have a type?
 };
 typedef struct statement statement;
 
@@ -195,6 +198,7 @@ symboltable* create_symboltable(char* name, symboltable* parent); // Create a ne
 symboltype* create_symboltype(enum symboltype_enum type, int width, symboltype* ptr); // Create a new symbol type
 symboltableentry* gentemp(symboltype* type, char* initial_value); // Generate a temporary variableint get_size(symboltype* type); // Get the width of a symbol
 symboltableentry* genparam(symboltype* type, char* initial_value); // Generate a parameter
+void update_return_ST(symboltable* currST, int update); // Update the return type of a function
 void update_type(symboltableentry* entry, symboltype* type); // Update the type of a symbol
 void print_ST(symboltable *currST); // Print the symbol table
 void update_ST(symboltable* currST, symboltableentry* entry); // Update the symbol table
