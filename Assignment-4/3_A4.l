@@ -39,7 +39,8 @@ STRING_LITERAL          ([\"])({S_CHAR_SEQUENCE})([\"])
 MULTI_LINE_COMMENT      (\/\*)([^\*]|\*[^\/])*(\*\/)
 SINGLE_LINE_COMMENT     (\/\/)([^\n])*
 COMMENT                 ({MULTI_LINE_COMMENT})|({SINGLE_LINE_COMMENT})
-WHITESPACE              [ \t\n\r]
+WHITESPACE              [ \t]
+NEWLINE                 [\n\r]
 
 
 /* Definitions of Rules \& Actions */
@@ -97,6 +98,7 @@ WHITESPACE              [ \t\n\r]
 ","                     { return COMMA; }
 {COMMENT}               { /* Ignore Comments */ }
 {WHITESPACE}            { /* Ignore Whitespace */ }
+{NEWLINE}               { yylineno++; }
 .                       { return -1; }
 %%
 
