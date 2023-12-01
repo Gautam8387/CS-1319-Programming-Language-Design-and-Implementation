@@ -29,14 +29,14 @@ enum symboltype_enum {
     TYPE_PTR,
     TYPE_FUNC,
     TYPE_ARRAY,
-    TYPE_STRING,
-    TYPE_BLOCK
+    TYPE_STRING
 };
 
 enum category_enum {
     TYPE_LOCAL,
     TYPE_GLOBAL,
     TYPE_PARAM,
+    TYPE_FUNCTION,
     TYPE_TEMP
 };
 

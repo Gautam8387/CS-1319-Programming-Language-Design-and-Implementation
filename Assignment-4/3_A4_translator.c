@@ -270,6 +270,8 @@ char* printType(symboltype* type){
     if(type == NULL){
         return "NULL";
     }
+    char* str = NULL;
+    char* str1 = NULL;
     switch(type->type){
         case TYPE_VOID:
             return "void";
@@ -278,11 +280,11 @@ char* printType(symboltype* type){
         case TYPE_CHAR:
             return "char";
         case TYPE_PTR:
-            char* str = (char*)malloc(sizeof(char)*10);
+            str = (char*)malloc(sizeof(char)*10);
             sprintf(str, "*%s", printType(type->ptr));
             return str;
         case TYPE_ARRAY:
-            char* str1 = (char*)malloc(sizeof(char)*50);
+            str1 = (char*)malloc(sizeof(char)*50);
             sprintf(str1, "array(%d,%s)", type->width, printType(type->ptr));
             return str1;
         case TYPE_FUNC:
@@ -306,6 +308,8 @@ char* printCategory(enum category_enum category){
             return "param";
         case TYPE_TEMP:
             return "temp";
+        case TYPE_FUNCTION:
+            return "function";
         default:
             return "NULL";
     }
