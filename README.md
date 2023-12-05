@@ -16,3 +16,6 @@ This assignment is to write a parser for nanoC. The parser is implemented using 
 
 ## Assignment 4
 This assignment is to write a symbol table for nanoC. We also generate the intermediate (three address) code and Quads for nanoC. The symbol table and intermediate code is implemented using ```C```.
+
+## Assignment 5
+This assignment is to generate the target code translator from the TAC quad array (with the supporting symbol table, and other auxiliary data structures) to the assembly language of ```x86/IA-32/x86-64```. The translation is now machine-specific and your generated assembly code would be translated with the gcc assembler to produce the final executable codes for the ```nanoC``` program.
