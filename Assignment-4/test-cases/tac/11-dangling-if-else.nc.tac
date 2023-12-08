@@ -318,22 +318,22 @@ Global Symbol Table:
 ==================================================================================================================
 Symbol Table: Global                              Parent: NULL
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-max            function       temp                -                   0              max                 
-main           function       temp                -                   0              main                
+max            int            function            -                   4              0              max                 
+main           int            function            -                   4              0              main                
 ==================================================================================================================
 
 
 ==================================================================================================================
 Symbol Table: max                                                Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-a              int            param               -                   4              -
-b              int            param               -                   4              -
-c              int            param               -                   4              -
-retValue       int            local               -                   4              -
+a              int            param               -                   4              0              -
+b              int            param               -                   4              0              -
+c              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
 ==================================================================================================================
 
 
@@ -341,18 +341,18 @@ retValue       int            local               -                   4         
 ==================================================================================================================
 Symbol Table: main                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-retValue       int            local               -                   4              -
-a              int            local               1                   4              -
-t0             int            temp                1                   4              -
-b              int            local               2                   4              -
-t1             int            temp                2                   4              -
-c              int            local               3                   4              -
-t2             int            temp                3                   4              -
-d              int            local               -                   4              -
-t3             int            temp                -                   4              -
-t4             int            temp                0                   4              -
+retValue       int            local               -                   4              0              -
+a              int            local               1                   4              0              -
+t0             int            temp                1                   4              0              -
+b              int            local               2                   4              0              -
+t1             int            temp                2                   4              0              -
+c              int            local               3                   4              0              -
+t2             int            temp                3                   4              0              -
+d              int            local               -                   4              0              -
+t3             int            temp                -                   4              0              -
+t4             int            temp                0                   4              0              -
 ==================================================================================================================
 
 

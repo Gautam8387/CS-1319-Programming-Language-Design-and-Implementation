@@ -261,7 +261,7 @@ int get_size(symboltype* type){
         case TYPE_STRING:
             return type->width;
         case TYPE_FUNC:
-            return 0;
+            return size_of_pointer;
     }
 }
 
@@ -473,7 +473,7 @@ void print_ST(symboltable *currST){
     printf("\n\n==================================================================================================================\n");
     (currST->parent) ? printf("Symbol Table: %-50s Parent: ST.%s\n", currST->name, currST->parent->name) : printf("Symbol Table: %-35s Parent: NULL\n", currST->name);
     printf("------------------------------------------------------------------------------------------------------------------\n");
-    printf("%-15s%-15s%-20s%-20s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Nested Table");
+    printf("%-15s%-15s%-20s%-20s%-15s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Offset", "Nested Table");
     printf("------------------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
@@ -482,7 +482,7 @@ void print_ST(symboltable *currST){
         printf("%-20s", printCategory(entry->category));
         (entry->initial_value) ? printf("%-20s", entry->initial_value) : printf("%-20s", "-");
         printf("%-15d", entry->size);
-        // printf("%-15s", "-");
+        printf("%-15d", entry->offset); // offset is not updated
         if(entry->next != NULL){
             printf("%-20s\n", entry->next->name);
         }
@@ -496,7 +496,7 @@ void print_ST(symboltable *currST){
     // print the nested symbol tables
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
-        if(entry->next != NULL && entry->category == TYPE_FUNC){
+        if(entry->next != NULL && entry->category == TYPE_FUNCTION){
             print_ST(entry->next);
             printf("\n");
         }

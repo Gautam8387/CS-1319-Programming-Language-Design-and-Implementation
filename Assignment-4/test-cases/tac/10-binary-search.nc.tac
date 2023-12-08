@@ -830,24 +830,24 @@ Global Symbol Table:
 ==================================================================================================================
 Symbol Table: Global                              Parent: NULL
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-printInt       function       temp                -                   0              printInt            
-readInt        function       temp                -                   0              readInt             
-printStr       function       temp                -                   0              printStr            
-arr            array(10,int)  global              0                   40             -
-binarySearch   function       temp                -                   0              binarySearch        
-main           function       temp                -                   0              main                
+printInt       int            function            -                   4              0              printInt            
+readInt        int            function            -                   4              0              readInt             
+printStr       char           function            -                   4              0              printStr            
+arr            array(10,int)  global              0                   40             0              -
+binarySearch   int            function            -                   4              0              binarySearch        
+main           int            function            -                   4              0              main                
 ==================================================================================================================
 
 
 ==================================================================================================================
 Symbol Table: printInt                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-x              int            param               -                   4              -
-retValue       int            local               -                   4              -
+x              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
 ==================================================================================================================
 
 
@@ -855,11 +855,11 @@ retValue       int            local               -                   4         
 ==================================================================================================================
 Symbol Table: readInt                                            Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-n              *int           param               -                   4              -
-retValue       int            local               -                   4              -
-t0             int            temp                -                   4              -
+n              *int           param               -                   4              0              -
+retValue       int            local               -                   4              0              -
+t0             int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -867,11 +867,11 @@ t0             int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: printStr                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-s              *char          param               -                   4              -
-retValue       char           local               -                   1              -
-t1             char           temp                -                   1              -
+s              *char          param               -                   4              0              -
+retValue       char           local               -                   1              0              -
+t1             char           temp                -                   1              0              -
 ==================================================================================================================
 
 
@@ -879,27 +879,27 @@ t1             char           temp                -                   1         
 ==================================================================================================================
 Symbol Table: binarySearch                                       Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-l              int            param               -                   4              -
-r              int            param               -                   4              -
-x              int            param               -                   4              -
-retValue       int            local               -                   4              -
-mid            int            local               -                   4              -
-t2             int            temp                -                   4              -
-t3             int            temp                2                   4              -
-t4             int            temp                -                   4              -
-t5             int            temp                -                   4              -
-t6             int            temp                -                   4              -
-t7             int            temp                -                   4              -
-t8             int            temp                1                   4              -
-t9             int            temp                -                   4              -
-t10            int            temp                -                   4              -
-t11            int            temp                1                   4              -
-t12            int            temp                -                   4              -
-t13            int            temp                -                   4              -
-t14            int            temp                1                   4              -
-t15            int            temp                -                   4              -
+l              int            param               -                   4              0              -
+r              int            param               -                   4              0              -
+x              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
+mid            int            local               -                   4              0              -
+t2             int            temp                -                   4              0              -
+t3             int            temp                2                   4              0              -
+t4             int            temp                -                   4              0              -
+t5             int            temp                -                   4              0              -
+t6             int            temp                -                   4              0              -
+t7             int            temp                -                   4              0              -
+t8             int            temp                1                   4              0              -
+t9             int            temp                -                   4              0              -
+t10            int            temp                -                   4              0              -
+t11            int            temp                1                   4              0              -
+t12            int            temp                -                   4              0              -
+t13            int            temp                -                   4              0              -
+t14            int            temp                1                   4              0              -
+t15            int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -907,36 +907,36 @@ t15            int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: main                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-retValue       int            local               -                   4              -
-n              int            local               5                   4              -
-t16            int            temp                5                   4              -
-t17            int            temp                0                   4              -
-t18            int            temp                2                   4              -
-t19            int            temp                1                   4              -
-t20            int            temp                3                   4              -
-t21            int            temp                2                   4              -
-t22            int            temp                4                   4              -
-t23            int            temp                3                   4              -
-t24            int            temp                10                  4              -
-t25            int            temp                4                   4              -
-t26            int            temp                40                  4              -
-x              int            local               10                  4              -
-t27            int            temp                10                  4              -
-result         int            local               -                   4              -
-t28            int            temp                0                   4              -
-t29            int            temp                1                   4              -
-t30            int            temp                -                   4              -
-t31            int            temp                -                   4              -
-t32            int            temp                1                   4              -
-t33            int            temp                -                   4              -
-t34            *char          temp                "Element is not present in array"4              -
-t35            char           temp                -                   1              -
-t36            *char          temp                "Element is present at index "4              -
-t37            char           temp                -                   1              -
-t38            int            temp                -                   4              -
-t39            int            temp                0                   4              -
+retValue       int            local               -                   4              0              -
+n              int            local               5                   4              0              -
+t16            int            temp                5                   4              0              -
+t17            int            temp                0                   4              0              -
+t18            int            temp                2                   4              0              -
+t19            int            temp                1                   4              0              -
+t20            int            temp                3                   4              0              -
+t21            int            temp                2                   4              0              -
+t22            int            temp                4                   4              0              -
+t23            int            temp                3                   4              0              -
+t24            int            temp                10                  4              0              -
+t25            int            temp                4                   4              0              -
+t26            int            temp                40                  4              0              -
+x              int            local               10                  4              0              -
+t27            int            temp                10                  4              0              -
+result         int            local               -                   4              0              -
+t28            int            temp                0                   4              0              -
+t29            int            temp                1                   4              0              -
+t30            int            temp                -                   4              0              -
+t31            int            temp                -                   4              0              -
+t32            int            temp                1                   4              0              -
+t33            int            temp                -                   4              0              -
+t34            *char          temp                "Element is not present in array"4              0              -
+t35            char           temp                -                   1              0              -
+t36            *char          temp                "Element is present at index "4              0              -
+t37            char           temp                -                   1              0              -
+t38            int            temp                -                   4              0              -
+t39            int            temp                0                   4              0              -
 ==================================================================================================================
 
 

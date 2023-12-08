@@ -15,7 +15,7 @@ extern int yyparse(void);
 /**************************************************************************/
 qArray* quadArray;           // pointer to the head of the quad array linked list
 var_type_stack var_type;            // declare the stack
-string_list* string_head;           // linked list for string literals
+string_list* string_head=NULL;           // linked list for string literals
 symboltable* globalST;              // pointer to Global Symbol Table
 symboltable* currST;                // pointer to Current Symbol Table
 symboltable* new_ST;                // pointer to new Symbol Table  -- used in function declaration
@@ -202,7 +202,7 @@ enum symboltype_enum pop(var_type_stack *s){
 string_list* string_list_initialize(){
     string_list* head = (string_list*)malloc(sizeof(string_list));
     head->str = NULL;
-    head->entries = 0;
+    head->entries = -1;
     head->next = NULL;
     return head;
 }
@@ -238,6 +238,16 @@ void ll_delete(string_list* head){
         curr = curr->next;
         free(temp);
     }
+}
+
+int ll_length(string_list* head){
+    int count = 0;
+    string_list* curr = head;
+    while(curr != NULL && curr->str != NULL){
+        count++;
+        curr = curr->next;
+    }
+    return count;
 }
 
 param_list* param_list_initialize(){
@@ -439,8 +449,8 @@ bool search_global(char *key, globalVars *hashmap[]){
 /*                          TARGET TRANSLATIONS                           */
 /**************************************************************************/
 void gen_activation_record(symboltable* currST){
-    int local = -4;
-    int param = 8;
+    int local = -20;
+    int param = -24;
 
     // iterate over the symbol table entries
     for(int i=0; i < currST->count; i++){
@@ -448,8 +458,8 @@ void gen_activation_record(symboltable* currST){
         // printf("Entry: %s\n", entry->name);
         if(entry->category == TYPE_PARAM){
             // printf("Param: %s\n", entry->name);
-            insert_ar(entry->name, param, currST->_aRecord);
             param += entry->size;
+            insert_ar(entry->name, param, currST->_aRecord);
         }
         else if(entry->category == TYPE_RETURN){
             // printf("Local: %s\n", entry->name);
@@ -461,8 +471,8 @@ void gen_activation_record(symboltable* currST){
         }
         else{
             // printf("Local: %s\n", entry->name);
-            insert_ar(entry->name, local, currST->_aRecord);
             local -= entry->size;
+            insert_ar(entry->name, local, currST->_aRecord);
         }
     }
     return;
@@ -531,7 +541,7 @@ void tac2x86(){
         currentQArray = currentQArray->nextQuad;
     }
     // second loop -- update _lablesRecord values and count
-    // AMBIGIOUS    
+    // AMBIGIOUS
     for(int i=0; i < MAX_HASH_LABEL; i++){
         HashLabel* temp = _lablesRecord[i];
         while(temp != NULL){
@@ -542,8 +552,8 @@ void tac2x86(){
             temp->value = new_instr_no;
             temp = temp->next;
             */
-            _LabelCount++;
-            temp->value = _LabelCount;
+            // _LabelCount++;
+            temp->value = ++_LabelCount;
             temp = temp->next;
         }
     }
@@ -571,7 +581,7 @@ void tac2x86(){
                 insert_global(entry->name, true, _globalVars);
             }
             // INT
-            else if(entry->type->type == TYPE_INT){
+            if(entry->type->type == TYPE_INT){
                 if(entry->initial_value == NULL){
                     // printf("Global Int: %s\n", entry->name);
                     printf("\t.comm\t%s,4,4\n", entry->name);
@@ -585,13 +595,13 @@ void tac2x86(){
                     printf("\t.size\t%s, 4\n", entry->name);
                     printf("%s:\n", entry->name);
                     // long -> int
-                    printf("\t.int\t%d\n", atoi(entry->initial_value));
+                    printf("\t.long\t%d\n", atoi(entry->initial_value));
                 }
                 // insert into global hashmap
                 insert_global(entry->name, true, _globalVars);
             }
             // ARRAY
-            else if(entry->type->type == TYPE_ARRAY){
+            if(entry->type->type == TYPE_ARRAY){
                 printf("\t.comm\t%s,%d,4\n", entry->name, entry->size);
                 // insert into global hashmap
                 insert_global(entry->name, true, _globalVars);
@@ -602,12 +612,9 @@ void tac2x86(){
     // STRINGS -- LL at string_head
     string_list* currString = string_head;
     // get size
-    int string_head_size = 0;
-    while(currString != NULL && currString->str != NULL){
-        string_head_size++;
-        currString = currString->next;
-    }
-    if(string_head_size){
+    int string_head_size = ll_length(string_head);
+    // printf("\n\nLENGTH: %d\n\n", string_head_size);
+    if(string_head_size>0){
         printf("\t.section\t.rodata\n");
         currString = string_head;
         while(currString != NULL){
@@ -616,6 +623,7 @@ void tac2x86(){
             currString = currString->next;
         }
     }
+
     // TEXT SECTION
     printf("\t.text \n");
     // initialize params list
@@ -626,17 +634,17 @@ void tac2x86(){
     currentQArray = quadArray;
     
     while(currentQArray != NULL && currentQArray->arr != NULL && currentQArray->count != 0){
-        int iterator = currentQArray->count;
+        int iterator = currentQArray->count; // -1 ?
         if(label_count(iterator, _lablesRecord)){
             int count = label_at(iterator, _lablesRecord)->value;
-            printf(".L%d: \n", 2 * _LabelCount + count + 2);
+            printf(".L%d:\n", 2 * _LabelCount + count + 2);
         }
         
         char* op = printOP(currentQArray->arr->op);
         char* arg1 = (currentQArray->arr->arg1 == NULL)?(NULL):(strdup(currentQArray->arr->arg1));
         char* arg2 = (currentQArray->arr->arg2 == NULL)?(NULL):(strdup(currentQArray->arr->arg2));
         char* result = (currentQArray->arr->result == NULL)?(NULL):(strdup(currentQArray->arr->result));
-        char* s = (arg2 == NULL)?(NULL):(strdup(arg2));
+        char* s = arg2;
         
         // Activation Record of Result
         char* result_ar;
@@ -679,7 +687,6 @@ void tac2x86(){
             arg2_ar = (char*)malloc(sizeof(char)*15);
             sprintf(arg2_ar, "%d(%%rbp)", offset);
         }
-        
         // parameter type
         if(op == "param"){
             // push arg1 to params_head
@@ -707,22 +714,22 @@ void tac2x86(){
                 }
                 else{
                     // AMBIGIOUS
-                    printf("movl \t%s, %%eax\n", arg1_ar);
-                    printf("movl \t%s, %%edx\n", arg2_ar);
-                    printf("\taddl \t%%eax, %%eax\n");
-                    printf("\tmovl \t%%eax, %s\n", result_ar);
+                    printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                    printf("\tmovl\t%s, %%edx\n", arg2_ar);
+                    printf("\taddl \t%%edx, %%eax\n");
+                    printf("\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             // Subtraction
             else if (op == "-"){
-                printf("movl \t%s, %%eax\n", arg1_ar);
-                printf("movl \t%s, %%edx\n", arg2_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%edx\n", arg2_ar);
                 printf("\tsubl \t%%edx, %%eax\n");
-                printf("\tmovl \t%%eax, %s\n", result_ar);
+                printf("\tmovl\t%%eax, %s\n", result_ar);
             }
             // multiplication
             else if(op == "*"){
-                printf("movl \t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 bool flag = true;
                 if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
                     flag = false;
@@ -738,33 +745,33 @@ void tac2x86(){
                 if(flag){
                     printf("# %s = %s * %s\n", result, arg1, arg2);
                     printf("\timull \t$%d, %%eax\n", atoi(arg2));
-                    symboltable* tempTab = globalST;
+                    symboltable* tempTab = currST;
                     char* val;
                     // check if arg1 is a global variable
                     for(int i=0; i <tempTab->count; i++){ 
                         if(strcmp((tempTab->table_entries[i])->name, arg1) == 0){
-                            val = strdup((tempTab->table_entries[i])->name);    // value found, propagate the name
+                            val = strdup((tempTab->table_entries[i])->initial_value);    // value found, propagate the name
                         }
                     }
                 }
                 else{
                     printf("\timull \t%s, %%eax\n", arg2_ar);
-                    printf("\tmovl \t%%eax, %s\n", result_ar);
+                    printf("\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             // division 
             else if(op=="/"){
-                printf("movl \t%s, %%eax\n", arg1_ar);
-                printf("\tcltd\n");
-                printf("\tidivl \t%s\n", arg2_ar);
-                printf("\tmovl \t%%eax, %s\n", result_ar);
-            }
-            // modulo
-            else if(op=="\%"){
                 printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcltd\n");
                 printf("\tidivl \t%s\n", arg2_ar);
-                printf("\tmovl \t%%edx, %s\n", result_ar);
+                printf("\tmovl\t%%eax, %s\n", result_ar);
+            }
+            // modulo
+            else if(op == "%"){
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                printf("\tcltd\n");
+                printf("\tidivl \t%s\n", arg2_ar);
+                printf("\tmovl\t%%edx, %s\n", result_ar);
             }
             // assign
             else if(op =="="){
@@ -774,7 +781,7 @@ void tac2x86(){
                     make_quad = false;
                 }
                 else{
-                    s = (arg1 == NULL)?(NULL):(strdup(arg1));
+                    s = arg1;//(arg1 == NULL)?(NULL):(strdup(arg1));
                     bool flag = true;
                     if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
                         flag = false;
@@ -788,49 +795,50 @@ void tac2x86(){
                             flag = false;
                     }
                     if(flag){
-                        printf("movl \t$%d, %%eax\n", atoi(arg1));
+                        printf("movl\t$%d, %%eax\n", atoi(arg1));
                     }
                     else{
-                        printf("movl \t%s, %%eax\n", arg1_ar);
+                        printf("\tmovl\t%s, %%eax\n", arg1_ar);
                     }
+                    printf("\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             else if(op=="=str"){
-                printf("\tmovq \t$.LC%s, %s\n", arg1, result_ar);
+                printf("movq \t$.LC%s, %s\n", arg1, result_ar);
             }
             // Relational
             else if(op=="=="){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tje .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="!="){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tjne .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="<"){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tjl .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op==">"){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tjg .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="<="){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tjle .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op==">="){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
                 printf("\tjge .L%d\n", 2 * _LabelCount + tempCount + 2);
@@ -838,7 +846,7 @@ void tac2x86(){
             else if(op=="goto"){
                 if (result != NULL) {
                     int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                    printf("\tjmp .L%d\n", 2 * _LabelCount + tempCount + 2);
+                    printf("jmp .L%d\n", 2 * _LabelCount + tempCount + 2);
                 }
             }
 
@@ -857,13 +865,13 @@ void tac2x86(){
             }
             else if(op=="*="){
                 printf("# *%s = %s\n", result, arg1);
-                printf("movl\t%s, %%eax\n", result_ar);
+                printf("\tmovl\t%s, %%eax\n", result_ar);
                 printf("\tmovl\t%s, %%edx\n", arg1_ar);
                 // cout << "\tmovl\t%edx, (%eax)";
                 printf("\tmovl\t%%edx, (%%eax)\n");
             }
             else if(op=="uminus"){
-                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
                 printf("\tnegl\t%%eax\n");
                 printf("\tmovl\t%%eax, %s\n", result_ar);
             }
@@ -903,7 +911,7 @@ void tac2x86(){
             }
             else if(op=="return"){
                 if(result != NULL){
-                    printf("movl\t%s, %%eax\n", result_ar);
+                    printf("\tmovl\t%s, %%eax\n", result_ar);
                 }
                 // jump to the end of the function -- epilogue
                 printf("\tjmp .LFE%d\n", _LabelCount);
@@ -917,28 +925,40 @@ void tac2x86(){
             else if(op=="call"){
                 // 4 registers are used for passing parameters -- rdi, rsi, rdx, rcx
                 param_list* tempPara = params_head;
-                int i=0;
+                
+                int paraCOUNT = 0;
                 while(tempPara != NULL){
-                    if(i == 0){
-                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
-                        printf("\tmovq\t%d(%%rbp), %%rdi\n", search_ar(tempPara->param, currST->_aRecord));
+                    paraCOUNT++;
+                    tempPara = tempPara->next;
+                }
+                tempPara = params_head;
+
+                for(int i=0; i<paraCOUNT; i++){
+                    if(i==0){
+                        // first parameter 
+                        int val = search_ar(tempPara->param, currST->_aRecord);
+                        printf("movl\t%d(%%rbp), %%eax\n", val);
+                        printf("\tmovq\t%d(%%rbp), %%rdi\n", val);
                     }
-                    else if (i==1){
-                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
-                        printf("\tmovq\t%d(%%rbp), %%rsi\n", search_ar(tempPara->param, currST->_aRecord));
+                    else if(i==1){
+                        int val = search_ar(tempPara->param, currST->_aRecord);
+                        printf("movl\t%d(%%rbp), %%eax\n", val);
+                        printf("\tmovq\t%d(%%rbp), %%rsi\n", val);
                     }
-                    else if (i==2){
-                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
-                        printf("\tmovq\t%d(%%rbp), %%rdx\n", search_ar(tempPara->param, currST->_aRecord));
+                    else if(i==2){
+                        int val = search_ar(tempPara->param, currST->_aRecord);
+                        printf("movl\t%d(%%rbp), %%eax\n", val);
+                        printf("\tmovq\t%d(%%rbp), %%rdx\n", val);
                     }
-                    else if (i==3){
-                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
-                        printf("\tmovq\t%d(%%rbp), %%rcx\n", search_ar(tempPara->param, currST->_aRecord));
+                    else if(i==3){
+                        int val = search_ar(tempPara->param, currST->_aRecord);
+                        printf("movl\t%d(%%rbp), %%eax\n", val);
+                        printf("\tmovq\t%d(%%rbp), %%rcx\n", val);
                     }
                     else{
-                        printf("\tmovq\t%d(%%rbp), %%rdi\n", search_ar(tempPara->param, currST->_aRecord));
+                        int val = search_ar(tempPara->param, currST->_aRecord);
+                        printf("\tmovq\t%d(%%rbp), %%rdi\n", val);
                     }
-                    i++;
                     tempPara = tempPara->next;
                 }
                 // clear para stack
@@ -946,6 +966,7 @@ void tac2x86(){
                 printf("\tcall\t%s\n", arg1);
                 printf("\tmovl\t%%eax, %s\n", result_ar);
             }
+
             else if(op == "function"){
                 // function begins -- prologue
                 printf(".globl\t%s\n", result);
@@ -959,15 +980,17 @@ void tac2x86(){
                 printf("\tmovq\t%%rsp, %%rbp\n");
                 printf("\t.cfi_def_cfa_register 5\n");
                 currST = lookup(globalST, result)->next;
-                // get last entry of the symbol table
+                // get last entry of the symbol table -- count starts from 0
                 symboltableentry* lastEntry = currST->table_entries[currST->count-1];
+                // printf("\n\nST ENTRY: %s\n\n", currST->name);
+                // printf("\n\nST ENTRYsss: %d\n\n", currST->count);
                 // printf("\n\nLAST ENTRY: %s\n\n", lastEntry->name);
                 // printf("\n\nLAST ENTRY SIZE: %d\n\n", lastEntry->size);
                 // printf("\n\nLAST ENTRY OFFSET: %d\n\n", lastEntry->offset);
                 // get the size of the symbol table
-                int sizeTemp = lastEntry->offset + lastEntry->size;
+                int sizeTemp = lastEntry->offset;
                 // rsp register holds the address of the top of the stack
-                printf("\tsubq\t$%d, %%rsp\n", sizeTemp);  // MAX BUFFER: 4 Para + retVal + RA = 24 = (4+1+1)*4
+                printf("\tsubq\t$%d, %%rsp\n", sizeTemp+24);  // MAX BUFFER: 4 Para + retVal + RA = 24 = (4+1+1)*4
 
                 // function table -- paramaters section
                 for(int i=0; i < currST->paramCount; i++){
@@ -999,7 +1022,7 @@ void tac2x86(){
             else{
                 printf("op: %s\n", op);
             }
-            printf("\n");
+            // printf("\n");
         }
         currentQArray = currentQArray->nextQuad;
     }
@@ -1224,6 +1247,7 @@ void push_args(symboltable* currST, symboltableentry* arg){
     if(currST->_argList == NULL){
         currST->_argList = (symboltableentry**)malloc(sizeof(symboltableentry*));
         currST->_argList[0] = arg;
+        currST->paramCount++;
         return;
     }
     int count = 0;
@@ -1232,6 +1256,7 @@ void push_args(symboltable* currST, symboltableentry* arg){
     }
     currST->_argList = (symboltableentry**)realloc(currST->_argList, sizeof(symboltableentry*)*(count+1));
     currST->_argList[count] = arg;
+    currST->paramCount++;
     return;
 }
 
@@ -1528,7 +1553,7 @@ int main(){
     printf("\n\n\n");
     print_quadArray(quadArray);
     printf("\n\n\n");
-    printf("x86:\n");
+    // printf("x86:\n");
     tac2x86();
     return 0;
 }

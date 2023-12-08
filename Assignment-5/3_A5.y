@@ -124,8 +124,15 @@ primary_expression : IDENTIFIER {
                             $$->loc->type->ptr = create_symboltype(TYPE_CHAR, 1, NULL);
                             // Store the String in linekd list of strings
                             ll_insert(string_head, $1);
+                            // calculate length of string_head
+                            int length = ll_length(string_head);
+                            length = length - 1;
+                            printf("\n\nLENGTH %d\n\n", length);
+                            // convert to string
+                            char* tempLength = (char*)malloc(sizeof(char)*10);
+                            sprintf(tempLength, "%d", length);
                             // emit the results, set size of linked list
-                            emit(OP_ASSIGN_STR, $1, NULL, $$->loc->name);
+                            emit(OP_ASSIGN_STR, tempLength, NULL, $$->loc->name);
                             printf("primary-expression\n");
                         }
                    | L_PARENTHESIS expression R_PARENTHESIS {

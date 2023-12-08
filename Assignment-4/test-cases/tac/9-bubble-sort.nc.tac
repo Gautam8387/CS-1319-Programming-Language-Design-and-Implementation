@@ -1176,27 +1176,27 @@ Global Symbol Table:
 ==================================================================================================================
 Symbol Table: Global                              Parent: NULL
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-printInt       function       temp                -                   0              printInt            
-readInt        function       temp                -                   0              readInt             
-printStr       function       temp                -                   0              printStr            
-swap           function       temp                -                   0              swap                
-readArray      function       temp                -                   0              readArray           
-printArray     function       temp                -                   0              printArray          
-bubbleSort     function       temp                -                   0              bubbleSort          
-arr            array(20,int)  global              0                   80             -
-main           function       temp                -                   0              main                
+printInt       int            function            -                   4              0              printInt            
+readInt        int            function            -                   4              0              readInt             
+printStr       char           function            -                   4              0              printStr            
+swap           void           function            -                   4              0              swap                
+readArray      void           function            -                   4              0              readArray           
+printArray     void           function            -                   4              0              printArray          
+bubbleSort     void           function            -                   4              0              bubbleSort          
+arr            array(20,int)  global              0                   80             0              -
+main           int            function            -                   4              0              main                
 ==================================================================================================================
 
 
 ==================================================================================================================
 Symbol Table: printInt                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-x              int            param               -                   4              -
-retValue       int            local               -                   4              -
+x              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
 ==================================================================================================================
 
 
@@ -1204,11 +1204,11 @@ retValue       int            local               -                   4         
 ==================================================================================================================
 Symbol Table: readInt                                            Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-n              *int           param               -                   4              -
-retValue       int            local               -                   4              -
-t0             int            temp                -                   4              -
+n              *int           param               -                   4              0              -
+retValue       int            local               -                   4              0              -
+t0             int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -1216,11 +1216,11 @@ t0             int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: printStr                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-s              *char          param               -                   4              -
-retValue       char           local               -                   1              -
-t1             char           temp                -                   1              -
+s              *char          param               -                   4              0              -
+retValue       char           local               -                   1              0              -
+t1             char           temp                -                   1              0              -
 ==================================================================================================================
 
 
@@ -1228,15 +1228,15 @@ t1             char           temp                -                   1         
 ==================================================================================================================
 Symbol Table: swap                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-p              *int           param               -                   4              -
-q              *int           param               -                   4              -
-t              int            local               -                   4              -
-t13            int            temp                -                   4              -
-t14            int            temp                -                   4              -
-t15            int            temp                -                   4              -
-t16            int            temp                -                   4              -
+p              *int           param               -                   4              0              -
+q              *int           param               -                   4              0              -
+t              int            local               -                   4              0              -
+t13            int            temp                -                   4              0              -
+t14            int            temp                -                   4              0              -
+t15            int            temp                -                   4              0              -
+t16            int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -1244,17 +1244,17 @@ t16            int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: readArray                                          Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-size           int            param               -                   4              -
-i              int            local               -                   4              -
-t17            int            temp                0                   4              -
-t18            int            temp                1                   4              -
-t19            int            temp                -                   4              -
-t20            *char          temp                "Input next element\n"4              -
-t21            char           temp                -                   1              -
-t22            *array(20,int) temp                -                   4              -
-t23            int            temp                -                   4              -
+size           int            param               -                   4              0              -
+i              int            local               -                   4              0              -
+t17            int            temp                0                   4              0              -
+t18            int            temp                1                   4              0              -
+t19            int            temp                -                   4              0              -
+t20            *char          temp                "Input next element\n"4              0              -
+t21            char           temp                -                   1              0              -
+t22            *array(20,int) temp                -                   4              0              -
+t23            int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -1262,19 +1262,19 @@ t23            int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: printArray                                         Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-size           int            param               -                   4              -
-i              int            local               -                   4              -
-t24            int            temp                0                   4              -
-t25            int            temp                1                   4              -
-t26            int            temp                -                   4              -
-t27            int            temp                -                   4              -
-t28            int            temp                -                   4              -
-t29            *char          temp                " "                 4              -
-t30            char           temp                -                   1              -
-t31            *char          temp                "\n"                4              -
-t32            char           temp                -                   1              -
+size           int            param               -                   4              0              -
+i              int            local               -                   4              0              -
+t24            int            temp                0                   4              0              -
+t25            int            temp                1                   4              0              -
+t26            int            temp                -                   4              0              -
+t27            int            temp                -                   4              0              -
+t28            int            temp                -                   4              0              -
+t29            *char          temp                " "                 4              0              -
+t30            char           temp                -                   1              0              -
+t31            *char          temp                "\n"                4              0              -
+t32            char           temp                -                   1              0              -
 ==================================================================================================================
 
 
@@ -1282,30 +1282,30 @@ t32            char           temp                -                   1         
 ==================================================================================================================
 Symbol Table: bubbleSort                                         Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-n              int            param               -                   4              -
-i              int            local               -                   4              -
-j              int            local               -                   4              -
-t33            int            temp                0                   4              -
-t34            int            temp                1                   4              -
-t35            int            temp                -                   4              -
-t36            int            temp                1                   4              -
-t37            int            temp                -                   4              -
-t38            int            temp                0                   4              -
-t39            int            temp                -                   4              -
-t40            int            temp                1                   4              -
-t41            int            temp                -                   4              -
-t42            int            temp                1                   4              -
-t43            int            temp                -                   4              -
-t44            int            temp                -                   4              -
-t45            int            temp                1                   4              -
-t46            int            temp                -                   4              -
-t47            int            temp                -                   4              -
-t48            *array(20,int) temp                -                   4              -
-t49            int            temp                1                   4              -
-t50            int            temp                -                   4              -
-t51            *array(20,int) temp                -                   4              -
+n              int            param               -                   4              0              -
+i              int            local               -                   4              0              -
+j              int            local               -                   4              0              -
+t33            int            temp                0                   4              0              -
+t34            int            temp                1                   4              0              -
+t35            int            temp                -                   4              0              -
+t36            int            temp                1                   4              0              -
+t37            int            temp                -                   4              0              -
+t38            int            temp                0                   4              0              -
+t39            int            temp                -                   4              0              -
+t40            int            temp                1                   4              0              -
+t41            int            temp                -                   4              0              -
+t42            int            temp                1                   4              0              -
+t43            int            temp                -                   4              0              -
+t44            int            temp                -                   4              0              -
+t45            int            temp                1                   4              0              -
+t46            int            temp                -                   4              0              -
+t47            int            temp                -                   4              0              -
+t48            *array(20,int) temp                -                   4              0              -
+t49            int            temp                1                   4              0              -
+t50            int            temp                -                   4              0              -
+t51            *array(20,int) temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -1313,21 +1313,21 @@ t51            *array(20,int) temp                -                   4         
 ==================================================================================================================
 Symbol Table: main                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-retValue       int            local               -                   4              -
-n              int            local               -                   4              -
-t2             *char          temp                "Input array size: \n"4              -
-t3             char           temp                -                   1              -
-t4             *int           temp                -                   4              -
-t5             int            temp                -                   4              -
-t6             *char          temp                "Input array elements: \n"4              -
-t7             char           temp                -                   1              -
-t8             *char          temp                "Input array: \n"   4              -
-t9             char           temp                -                   1              -
-t10            *char          temp                "Sorted array: \n"  4              -
-t11            char           temp                -                   1              -
-t12            int            temp                0                   4              -
+retValue       int            local               -                   4              0              -
+n              int            local               -                   4              0              -
+t2             *char          temp                "Input array size: \n"4              0              -
+t3             char           temp                -                   1              0              -
+t4             *int           temp                -                   4              0              -
+t5             int            temp                -                   4              0              -
+t6             *char          temp                "Input array elements: \n"4              0              -
+t7             char           temp                -                   1              0              -
+t8             *char          temp                "Input array: \n"   4              0              -
+t9             char           temp                -                   1              0              -
+t10            *char          temp                "Sorted array: \n"  4              0              -
+t11            char           temp                -                   1              0              -
+t12            int            temp                0                   4              0              -
 ==================================================================================================================
 
 

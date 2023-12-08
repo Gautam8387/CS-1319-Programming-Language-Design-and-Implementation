@@ -658,23 +658,23 @@ Global Symbol Table:
 ==================================================================================================================
 Symbol Table: Global                              Parent: NULL
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-printInt       function       temp                -                   0              printInt            
-readInt        function       temp                -                   0              readInt             
-printStr       function       temp                -                   0              printStr            
-swap           function       temp                -                   0              swap                
-main           function       temp                -                   0              main                
+printInt       int            function            -                   4              0              printInt            
+readInt        int            function            -                   4              0              readInt             
+printStr       char           function            -                   4              0              printStr            
+swap           void           function            -                   4              0              swap                
+main           int            function            -                   4              0              main                
 ==================================================================================================================
 
 
 ==================================================================================================================
 Symbol Table: printInt                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-x              int            param               -                   4              -
-retValue       int            local               -                   4              -
+x              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
 ==================================================================================================================
 
 
@@ -682,11 +682,11 @@ retValue       int            local               -                   4         
 ==================================================================================================================
 Symbol Table: readInt                                            Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-n              *int           param               -                   4              -
-retValue       int            local               -                   4              -
-t0             int            temp                -                   4              -
+n              *int           param               -                   4              0              -
+retValue       int            local               -                   4              0              -
+t0             int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -694,11 +694,11 @@ t0             int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: printStr                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-s              *char          param               -                   4              -
-retValue       char           local               -                   1              -
-t1             char           temp                -                   1              -
+s              *char          param               -                   4              0              -
+retValue       char           local               -                   1              0              -
+t1             char           temp                -                   1              0              -
 ==================================================================================================================
 
 
@@ -706,15 +706,15 @@ t1             char           temp                -                   1         
 ==================================================================================================================
 Symbol Table: swap                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-p              *int           param               -                   4              -
-q              *int           param               -                   4              -
-t              int            local               -                   4              -
-t25            int            temp                -                   4              -
-t26            int            temp                -                   4              -
-t27            int            temp                -                   4              -
-t28            int            temp                -                   4              -
+p              *int           param               -                   4              0              -
+q              *int           param               -                   4              0              -
+t              int            local               -                   4              0              -
+t25            int            temp                -                   4              0              -
+t26            int            temp                -                   4              0              -
+t27            int            temp                -                   4              0              -
+t28            int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -722,34 +722,34 @@ t28            int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: main                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-retValue       int            local               -                   4              -
-x              int            local               -                   4              -
-y              int            local               -                   4              -
-t2             *int           temp                -                   4              -
-t3             int            temp                -                   4              -
-t4             *int           temp                -                   4              -
-t5             int            temp                -                   4              -
-t6             *char          temp                "Before swap:\n"    4              -
-t7             char           temp                -                   1              -
-t8             *char          temp                "x = "              4              -
-t9             char           temp                -                   1              -
-t10            int            temp                -                   4              -
-t11            *char          temp                " y = "             4              -
-t12            char           temp                -                   1              -
-t13            int            temp                -                   4              -
-t14            *int           temp                -                   4              -
-t15            *int           temp                -                   4              -
-t16            *char          temp                "\nAfter swap:\n"   4              -
-t17            char           temp                -                   1              -
-t18            *char          temp                "x = "              4              -
-t19            char           temp                -                   1              -
-t20            int            temp                -                   4              -
-t21            *char          temp                " y = "             4              -
-t22            char           temp                -                   1              -
-t23            int            temp                -                   4              -
-t24            int            temp                0                   4              -
+retValue       int            local               -                   4              0              -
+x              int            local               -                   4              0              -
+y              int            local               -                   4              0              -
+t2             *int           temp                -                   4              0              -
+t3             int            temp                -                   4              0              -
+t4             *int           temp                -                   4              0              -
+t5             int            temp                -                   4              0              -
+t6             *char          temp                "Before swap:\n"    4              0              -
+t7             char           temp                -                   1              0              -
+t8             *char          temp                "x = "              4              0              -
+t9             char           temp                -                   1              0              -
+t10            int            temp                -                   4              0              -
+t11            *char          temp                " y = "             4              0              -
+t12            char           temp                -                   1              0              -
+t13            int            temp                -                   4              0              -
+t14            *int           temp                -                   4              0              -
+t15            *int           temp                -                   4              0              -
+t16            *char          temp                "\nAfter swap:\n"   4              0              -
+t17            char           temp                -                   1              0              -
+t18            *char          temp                "x = "              4              0              -
+t19            char           temp                -                   1              0              -
+t20            int            temp                -                   4              0              -
+t21            *char          temp                " y = "             4              0              -
+t22            char           temp                -                   1              0              -
+t23            int            temp                -                   4              0              -
+t24            int            temp                0                   4              0              -
 ==================================================================================================================
 
 

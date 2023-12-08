@@ -1,12 +1,10 @@
-int d = 99;
-
-int fun(int c){
-    if(c%d == 0) return c;
-    else return c+1;
+int mod(int a, int b){
+    return a % b;
 }
 
 int main(){
-    int a = 1;
-    int ret = fun(a);
-    return 0;
+    int a = 10;
+    int b = 20;
+    int c = mod(a, b);
+    return c;
 }

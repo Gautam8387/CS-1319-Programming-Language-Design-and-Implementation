@@ -728,9 +728,11 @@ direct_declarator : IDENTIFIER {
                             // return type is that of func_ID
                             enum symboltype_enum tempReturn = $1->type->type;
 
-                            update_type($1, create_symboltype(TYPE_FUNC, 1, NULL));
+                            update_type($1, create_symboltype($1->type->type, 1, NULL));
 
-                            $1->category = TYPE_FUNC;
+                            $1->category = TYPE_FUNCTION;
+                            // all functions are of size size_of_pointer
+                            $1->size = size_of_pointer;
                             // create a new symbol table for the function
                             // currST->name = $1->name;
                             // link the symbol table to the global symbol table

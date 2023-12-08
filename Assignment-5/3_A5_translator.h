@@ -229,6 +229,7 @@ typedef struct string_list string_list;
 string_list* string_list_initialize();
 void ll_insert(string_list* head, char* str);
 void ll_delete(string_list* head);
+int ll_length(string_list* head);
 
 struct param_list{
     char* param;

@@ -373,22 +373,22 @@ Global Symbol Table:
 ==================================================================================================================
 Symbol Table: Global                              Parent: NULL
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-printInt       function       temp                -                   0              printInt            
-readInt        function       temp                -                   0              readInt             
-printStr       function       temp                -                   0              printStr            
-main           function       temp                -                   0              main                
+printInt       int            function            -                   4              0              printInt            
+readInt        int            function            -                   4              0              readInt             
+printStr       char           function            -                   4              0              printStr            
+main           int            function            -                   4              0              main                
 ==================================================================================================================
 
 
 ==================================================================================================================
 Symbol Table: printInt                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-x              int            param               -                   4              -
-retValue       int            local               -                   4              -
+x              int            param               -                   4              0              -
+retValue       int            local               -                   4              0              -
 ==================================================================================================================
 
 
@@ -396,11 +396,11 @@ retValue       int            local               -                   4         
 ==================================================================================================================
 Symbol Table: readInt                                            Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-n              *int           param               -                   4              -
-retValue       int            local               -                   4              -
-t0             int            temp                -                   4              -
+n              *int           param               -                   4              0              -
+retValue       int            local               -                   4              0              -
+t0             int            temp                -                   4              0              -
 ==================================================================================================================
 
 
@@ -408,11 +408,11 @@ t0             int            temp                -                   4         
 ==================================================================================================================
 Symbol Table: printStr                                           Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-s              *char          param               -                   4              -
-retValue       char           local               -                   1              -
-t1             char           temp                -                   1              -
+s              *char          param               -                   4              0              -
+retValue       char           local               -                   1              0              -
+t1             char           temp                -                   1              0              -
 ==================================================================================================================
 
 
@@ -420,25 +420,25 @@ t1             char           temp                -                   1         
 ==================================================================================================================
 Symbol Table: main                                               Parent: ST.Global
 ------------------------------------------------------------------------------------------------------------------
-Name           Type           Category            Initial Value       Size           Nested Table        
+Name           Type           Category            Initial Value       Size           Offset         Nested Table        
 ------------------------------------------------------------------------------------------------------------------
-retValue       int            local               -                   4              -
-n              int            local               -                   4              -
-i              int            local               0                   4              -
-t2             int            temp                0                   4              -
-r              int            local               1                   4              -
-t3             int            temp                1                   4              -
-t4             *int           temp                -                   4              -
-t5             int            temp                -                   4              -
-t6             int            temp                1                   4              -
-t7             int            temp                1                   4              -
-t8             int            temp                -                   4              -
-t9             int            temp                -                   4              -
-t10            int            temp                -                   4              -
-t11            *char          temp                "! = "              4              -
-t12            char           temp                -                   1              -
-t13            int            temp                -                   4              -
-t14            int            temp                0                   4              -
+retValue       int            local               -                   4              0              -
+n              int            local               -                   4              0              -
+i              int            local               0                   4              0              -
+t2             int            temp                0                   4              0              -
+r              int            local               1                   4              0              -
+t3             int            temp                1                   4              0              -
+t4             *int           temp                -                   4              0              -
+t5             int            temp                -                   4              0              -
+t6             int            temp                1                   4              0              -
+t7             int            temp                1                   4              0              -
+t8             int            temp                -                   4              0              -
+t9             int            temp                -                   4              0              -
+t10            int            temp                -                   4              0              -
+t11            *char          temp                "! = "              4              0              -
+t12            char           temp                -                   1              0              -
+t13            int            temp                -                   4              0              -
+t14            int            temp                0                   4              0              -
 ==================================================================================================================
 
 
