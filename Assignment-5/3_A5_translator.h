@@ -5,18 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 #define size_of_void 0;
 #define size_of_char 1;
 #define size_of_int 4;
 #define size_of_pointer 4;
 #define MAX_STACK 100
+#define MAX_HASH_AR 500
+#define MAX_HASH_LABEL 500
+#define MAX_HASH_GLOBAL 500
 
 // Global Symbol Tables
 extern struct symboltable* currST;       // Current Symbol Table
 extern struct symboltable* globalST;     // Global Symbol Table
 extern struct symboltable* new_ST;       // New Symbol Table -- used in function declaration
-extern struct var_type_stack var_type;// stack for storing the type of the variable
-extern struct string_list* string_head; // head of the string list
+extern struct var_type_stack var_type;   // stack for storing the type of the variable
+extern struct string_list* string_head;  // head of the string list
 extern char* yytext;        
 extern void yyerror(char *s);
 extern int yyparse(void);
@@ -37,38 +41,39 @@ enum category_enum {
     TYPE_GLOBAL,
     TYPE_PARAM,
     TYPE_FUNCTION,
-    TYPE_TEMP
+    TYPE_TEMP,
+    TYPE_RETURN
 };
 
 enum op_code{
-    OP_PLUS,
-    OP_MINUS,
-    OP_MULT,
-    OP_DIV,
-    OP_MOD,
-    OP_EQUALS,
-    OP_NOT_EQUALS,
-    OP_LT,
-    OP_LT_EQUALS,
-    OP_GT,
-    OP_GT_EQUALS,
-    OP_GOTO,
-    OP_ASSIGN,
-    OP_ASSIGN_STR,
-    OP_ASSIGN_AMPER,
-    OP_ASSIGN_ASTERISK,
-    OP_ASTERISK_ASSIGN,
-    OP_UMINUS,
-    OP_ASSIGN_BOX,
-    OP_BOX_ASSIGN,
-    OP_RETURN,
-    OP_PARAM,
-    OP_CALL,
-    OP_CALL_VOID,
-    OP_FUNC,
-    OP_LABEL,
-    OP_ENDFUNC,
-    OP_RETURN_VOID,
+    OP_PLUS,                // +
+    OP_MINUS,               // -
+    OP_MULT,                // *
+    OP_DIV,                 // /
+    OP_MOD,                 // %
+    OP_EQUALS,              // ==
+    OP_NOT_EQUALS,          // !=
+    OP_LT,                  // <
+    OP_LT_EQUALS,           // <=
+    OP_GT,                  // >
+    OP_GT_EQUALS,           // >=
+    OP_GOTO,                // goto
+    OP_ASSIGN,              // =
+    OP_ASSIGN_STR,          // =str
+    OP_ASSIGN_AMPER,        // =&
+    OP_ASSIGN_ASTERISK,     // =*
+    OP_ASTERISK_ASSIGN,     // *=
+    OP_UMINUS,              // unary -
+    OP_ASSIGN_BOX,          // =[]
+    OP_BOX_ASSIGN,          // []=
+    OP_RETURN,              // return
+    OP_PARAM,               // param
+    OP_CALL,                // call
+    OP_CALL_VOID,           // call void
+    OP_FUNC,                // function
+    OP_LABEL,               // label
+    OP_ENDFUNC,             // end
+    OP_RETURN_VOID,         // return void
 };
 
 /**************************************************************************/
@@ -95,6 +100,41 @@ char* printOP(enum op_code op); // Print the operator
 int nextInstr(); // Get the next instruction number
 qArray* quadArray_initialize(qArray* head); // Initialize the quadArray
 
+/**************************************************************************/
+/*                        ACTIVATION RECORD HASH                          */
+/**************************************************************************/
+struct HashLabel{
+    int key;
+    int value;
+    struct HashLabel* next;
+};
+typedef struct HashLabel HashLabel;
+struct HashAR{
+    char* key;
+    int value;
+    struct HashAR* next;
+};
+typedef struct HashAR HashAR;
+
+struct globalVars{
+    char* key;
+    bool value;
+    struct globalVars* next;
+};
+typedef struct globalVars globalVars;
+
+unsigned int hash_ar(char *key);
+void insert_ar(char *key, int value, HashAR* hashmap[]);
+int search_ar(char *key, HashAR *hashmap[]);
+
+unsigned int hash_label(int key);
+void insert_label(int key, int value, HashLabel *hashmap[]);
+bool label_count(int key, HashLabel *hashmap[]);
+HashLabel* label_at(int key, HashLabel *hashmap[]);
+
+unsigned int hash_global(char *key);
+void insert_global(char *key, bool value, globalVars *hashmap[]);
+bool search_global(char *key, globalVars *hashmap[]);
 
 /**************************************************************************/
 /*                        SYMBOL TABLE STRUCTURES                         */
@@ -105,7 +145,7 @@ struct symboltype{
     struct symboltype* ptr;    // Pointer to type of symbol (for TYPE_PTR)
 };
 typedef struct symboltype symboltype;
-// Name           Type           Category            Initial Value       Size           Nested Table
+
 struct symboltableentry{       // Structure of a symbol table entry (ROW) for variables
     char* name;                // Name of symbol
     symboltype* type;          // Type of symbol
@@ -128,6 +168,7 @@ struct symboltable{            // Structure of a symbol table (TABLE)
     symboltype* _retVal;        // Return type of function
     struct symboltable* next;         // Pointer to next symbol table
     int returnLabel;           // Return label
+    HashAR* _aRecord[MAX_HASH_AR];           // Activation Record Hashmap
 };
 typedef struct symboltable symboltable;
 
@@ -189,6 +230,17 @@ string_list* string_list_initialize();
 void ll_insert(string_list* head, char* str);
 void ll_delete(string_list* head);
 
+struct param_list{
+    char* param;
+    struct param_list* next;
+};
+typedef struct param_list param_list;
+// Param List Functions
+param_list* param_list_initialize();
+param_list* param_list_delete(param_list* head);
+void param_list_insert(param_list* head, char* str);
+param_list* param_list_delete(param_list* head);
+
 
 /**************************************************************************/
 /*                        SYMBOL TABLE FUNCTIONS                          */
@@ -199,6 +251,7 @@ symboltable* create_symboltable(char* name, symboltable* parent); // Create a ne
 symboltype* create_symboltype(enum symboltype_enum type, int width, symboltype* ptr); // Create a new symbol type
 symboltableentry* gentemp(symboltype* type, char* initial_value); // Generate a temporary variableint get_size(symboltype* type); // Get the width of a symbol
 symboltableentry* genparam(symboltype* type, char* initial_value); // Generate a parameter
+void set_offset(symboltable* currST); // Set the offset of a symbol
 void update_return_ST(symboltable* currST, int update); // Update the return type of a function
 void update_type(symboltableentry* entry, symboltype* type); // Update the type of a symbol
 void print_ST(symboltable *currST); // Print the symbol table
@@ -207,5 +260,12 @@ char* printType(symboltype* type); // Print the type of a symbol
 char* printCategory(enum category_enum category); // Print the category of a symbol
 int typecheck(symboltype* type1, symboltype* type2); // Check if two types are equal
 void push_args(symboltable* currST, symboltableentry* arg); // Push arguments to the symbol table
+
+/**************************************************************************/
+/*                              ASM GENERATOR                             */
+/**************************************************************************/
+void gen_activation_record(symboltable* currST);
+void tac2x86();
+void print_activationRecord(symboltable* currST);
 
 #endif // __PARSER_H

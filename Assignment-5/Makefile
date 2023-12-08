@@ -8,7 +8,10 @@ compiler: 3_A5.y 3_A5_translator.c 3_A5.l
 build: compiler
 
 test: compiler
-	./compiler < 3_A5.nc > test.out
+	./compiler < 3_A5.nc
 
 clean:
 	rm -f compiler lex.yy.c 3_A5.tab.c 3_A5_translator.tab.h test.out 3_A5.tab.o 3_A5.tab.h
+	
+test-all: compiler
+	python3 test-cases.py	

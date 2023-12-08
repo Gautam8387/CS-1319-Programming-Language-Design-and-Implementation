@@ -20,7 +20,9 @@ symboltable* globalST;              // pointer to Global Symbol Table
 symboltable* currST;                // pointer to Current Symbol Table
 symboltable* new_ST;                // pointer to new Symbol Table  -- used in function declaration
 static int tempCount = 0;               // count of the temporary variables
-
+int _LabelCount = 0;
+HashLabel* _lablesRecord[MAX_HASH_LABEL];
+globalVars* _globalVars[MAX_HASH_GLOBAL];
 
 
 /**************************************************************************/
@@ -238,6 +240,775 @@ void ll_delete(string_list* head){
     }
 }
 
+param_list* param_list_initialize(){
+    param_list* head = (param_list*)malloc(sizeof(param_list));
+    head->param = NULL;
+    head->next = NULL;
+    return head;
+}
+
+// insert a new string at the end of the linked list
+void param_list_insert(param_list* head, char* str){
+    // check if it is the first entry
+    if(head->param == NULL){
+        head->param = strdup(str);
+        return;
+    }
+    // insert new entry at the end
+    param_list* temp = (param_list*)malloc(sizeof(param_list));
+    temp->param = strdup(str);
+    temp->next = NULL;
+    param_list* curr = head;
+    while(curr->next != NULL){
+        curr = curr->next;
+    }
+    curr->next = temp;
+}
+
+// delete the linked list end entry
+param_list* param_list_delete(param_list* head){
+    param_list* curr = head;
+    while(curr != NULL){
+        param_list* temp = curr;
+        curr = curr->next;
+        free(temp);
+    }
+    head = param_list_initialize();
+    return head;
+}
+
+/**************************************************************************/
+/*                        ACTIVATION RECORD HASH                          */
+/**************************************************************************/
+// HASH for Activation Record
+unsigned int hash_ar(char *key){
+    unsigned int hashValue = 0;
+    while(*key !='\0'){
+        hashValue += *key++;
+    }
+    return hashValue % MAX_HASH_AR;
+}
+
+void insert_ar(char* key, int value, HashAR* hashmap[]){
+    if(key == NULL){
+        // printf("Error insert_ar: Key cannot be NULL.\n");
+        return;
+    }
+    int hashIndex = hash_ar(key);
+    HashAR* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(strcmp(temp->key, key) == 0){
+            temp->value = value;
+            return;
+        }
+        temp = temp->next;
+    }
+    HashAR* newNode = (HashAR*)malloc(sizeof(HashAR));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = hashmap[hashIndex];
+    hashmap[hashIndex] = newNode;
+}
+
+// search_ar() -- return the offset
+int search_ar(char *key, HashAR *hashmap[]){
+    if(key == NULL){
+        // printf("Error search_ar: Key cannot be NULL.\n");
+        return -1;
+    }
+    int hashIndex = hash_ar(key);
+    HashAR* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(strcmp(temp->key, key) == 0){
+            return temp->value;
+        }
+        temp = temp->next;
+    }
+    return -1;
+}
+
+// HASH for Label (return label)
+unsigned int hash_label(int key){
+    return key % MAX_HASH_LABEL;
+}
+
+void insert_label(int key, int value, HashLabel *hashmap[]){
+    if(key < 0){
+        // printf("Error: Key cannot be negative.\n");
+        return;
+    }
+    int hashIndex = hash_label(key);
+    HashLabel* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(temp->key == key){
+            temp->value = value;
+            return;
+        }
+        temp = temp->next;
+    }
+    HashLabel* newNode = (HashLabel*)malloc(sizeof(HashLabel));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = hashmap[hashIndex];
+    hashmap[hashIndex] = newNode;
+}
+
+bool label_count(int key, HashLabel *hashmap[]){
+    if(key < 0){
+        // printf("Error: Key cannot be negative.\n");
+        return false;
+    }
+    int hashIndex = hash_label(key);
+    HashLabel* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(temp->key == key){
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;
+}
+
+// lable_at() -- return the reference to the label
+HashLabel* label_at(int key, HashLabel *hashmap[]){
+    if(key < 0){
+        // printf("Error: Key cannot be negative.\n");
+        return NULL;
+    }
+    int hashIndex = hash_label(key);
+    HashLabel* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(temp->key == key){
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+// HASH for Global Variables
+unsigned int hash_global(char *key){
+    // used the djb2 hash function
+    unsigned int hashValue = 5381;
+    int c;
+    while ((c = *key++)) {
+        hashValue = ((hashValue << 5) + hashValue) + c; // hashValue * 33 + c
+    }
+    return hashValue % MAX_HASH_GLOBAL;
+}
+
+void insert_global(char* key, bool value, globalVars* hashmap[]){
+    if(key == NULL){
+        // printf("Error insert_global: Key cannot be NULL.\n");
+        return;
+    }
+    int hashIndex = hash_global(key);
+    globalVars* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(strcmp(temp->key, key) == 0){
+            temp->value = value;
+            return;
+        }
+        temp = temp->next;
+    }
+    globalVars* newNode = (globalVars*)malloc(sizeof(globalVars));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = hashmap[hashIndex];
+    hashmap[hashIndex] = newNode;
+}
+
+bool search_global(char *key, globalVars *hashmap[]){
+    if(key == NULL){
+        // printf("Error search_global: Key cannot be NULL.\n");
+        return false;
+    }
+    int hashIndex = hash_global(key);
+    // printf("\nSearching for %s on %d\n", key, hashIndex);
+    globalVars* temp = hashmap[hashIndex];
+    while(temp != NULL){
+        if(strcmp(temp->key, key) == 0){
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;
+}
+
+/**************************************************************************/
+/*                          TARGET TRANSLATIONS                           */
+/**************************************************************************/
+void gen_activation_record(symboltable* currST){
+    int local = -4;
+    int param = 8;
+
+    // iterate over the symbol table entries
+    for(int i=0; i < currST->count; i++){
+        symboltableentry* entry = currST->table_entries[i];
+        // printf("Entry: %s\n", entry->name);
+        if(entry->category == TYPE_PARAM){
+            // printf("Param: %s\n", entry->name);
+            insert_ar(entry->name, param, currST->_aRecord);
+            param += entry->size;
+        }
+        else if(entry->category == TYPE_RETURN){
+            // printf("Local: %s\n", entry->name);
+            continue;   
+        }
+        else if(entry->category == TYPE_FUNCTION){
+            // printf("Function: %s\n", entry->name);
+            gen_activation_record(entry->next);
+        }
+        else{
+            // printf("Local: %s\n", entry->name);
+            insert_ar(entry->name, local, currST->_aRecord);
+            local -= entry->size;
+        }
+    }
+    return;
+}
+
+void print_activationRecord(symboltable* currST){
+    printf("\n\n==================================================================================================================\n");
+    printf("ACTIVATION RECORD: %s\n", currST->name);
+    printf("------------------------------------------------------------------------------------------------------------------\n");
+    // name, category, offset, 
+    printf("%-15s%-15s%-15s%-15s\n", "Name", "Category", "Offset", "Nested Table");
+    printf("------------------------------------------------------------------------------------------------------------------\n");
+    for(int i=0; i< MAX_HASH_AR; i++){
+        HashAR* temp = currST->_aRecord[i];
+        // get symboltableentry of sa,e name from symbol table
+        while(temp != NULL){
+            symboltableentry* entry = lookup(currST, temp->key);
+            printf("%-15s", temp->key);
+            printf("%-15s", printCategory(entry->category));
+            printf("%-15d", temp->value);
+            printf("-\n");
+            temp = temp->next;
+        }
+    }
+    printf("==================================================================================================================\n");
+    // print the nested symbol tables
+    for(int i=0; i< currST->count; i++){
+        symboltableentry* entry = (currST->table_entries[i]);
+        if(entry->next != NULL && entry->category == TYPE_FUNCTION){
+            print_activationRecord(entry->next);
+            printf("\n");
+        }
+    }
+}
+
+// THREE ADDRESS CODE to x86 Assembly Code
+/*
+void iterate_hashmap(HashLabel* hashmap[], int size) {
+    for (int i = 0; i < size; ++i) {
+        HashLabel* current = hashmap[i];
+        while (current != NULL) {
+            // Process the current element (e.g., print key and value)
+            printf("Key: %d, Value: %d\n", current->key, current->value);
+
+            // Move to the next element in the linked list
+            current = current->next;
+        }
+    }
+}
+*/
+
+void tac2x86(){
+    // first loop
+    qArray* currentQArray = quadArray;
+    while(currentQArray !=NULL && currentQArray->arr != NULL && currentQArray->count != 0){
+    // printf("\n\nHELLO\n\n");
+        quad* currQ = currentQArray->arr;
+        if (currQ->op == OP_GOTO || currQ->op == OP_LT || currQ->op == OP_GT || currQ->op == OP_LT_EQUALS || currQ->op == OP_GT_EQUALS || currQ->op == OP_EQUALS || currQ->op == OP_NOT_EQUALS) {
+            if (currQ->result == NULL) {
+                currentQArray = currentQArray->nextQuad;
+                continue;
+            };
+            int instr_no = atoi(currQ->result);
+            insert_label(instr_no, 1, _lablesRecord);
+        }
+        currentQArray = currentQArray->nextQuad;
+    }
+    // second loop -- update _lablesRecord values and count
+    // AMBIGIOUS    
+    for(int i=0; i < MAX_HASH_LABEL; i++){
+        HashLabel* temp = _lablesRecord[i];
+        while(temp != NULL){
+            /*
+            int instr_no = temp->key;
+            int count = temp->value;
+            int new_instr_no = instr_no + count;
+            temp->value = new_instr_no;
+            temp = temp->next;
+            */
+            _LabelCount++;
+            temp->value = _LabelCount;
+            temp = temp->next;
+        }
+    }
+    // begin the .s file here
+    for(int i=0; i< globalST->count; i++){
+        symboltableentry* entry = (globalST->table_entries[i]);
+        if(entry->category != TYPE_FUNCTION){
+            // It is a Global Variable
+            // CHAR
+            if(entry->type->type == TYPE_CHAR){
+                if(entry->initial_value == NULL){
+                    // printf("Global Char: %s\n", entry->name);
+                    printf("\t.comm\t%s,1,1\n", entry->name);
+                }
+                else{
+                    // printf("Global Char: %s = %s\n", entry->name, entry->initial_value);
+                    printf("\t.globl\t%s\n", entry->name);
+                    // printf("\t.data\n");
+                    printf("\t.type\t%s, @object\n", entry->name);
+                    printf("\t.size\t%s, 1\n", entry->name);
+                    printf("%s:\n", entry->name);
+                    printf("\t.byte\t%d\n", atoi(entry->initial_value));
+                }
+                // insert into global hashmap
+                insert_global(entry->name, true, _globalVars);
+            }
+            // INT
+            else if(entry->type->type == TYPE_INT){
+                if(entry->initial_value == NULL){
+                    // printf("Global Int: %s\n", entry->name);
+                    printf("\t.comm\t%s,4,4\n", entry->name);
+                }
+                else{
+                    // printf("Global Int: %s = %s\n", entry->name, entry->initial_value);
+                    printf("\t.globl\t%s\n", entry->name);
+                    printf("\t.data\n");
+                    printf("\t.align 4\n");
+                    printf("\t.type\t%s, @object\n", entry->name);
+                    printf("\t.size\t%s, 4\n", entry->name);
+                    printf("%s:\n", entry->name);
+                    // long -> int
+                    printf("\t.int\t%d\n", atoi(entry->initial_value));
+                }
+                // insert into global hashmap
+                insert_global(entry->name, true, _globalVars);
+            }
+            // ARRAY
+            else if(entry->type->type == TYPE_ARRAY){
+                printf("\t.comm\t%s,%d,4\n", entry->name, entry->size);
+                // insert into global hashmap
+                insert_global(entry->name, true, _globalVars);
+            }
+        }
+    }
+    
+    // STRINGS -- LL at string_head
+    string_list* currString = string_head;
+    // get size
+    int string_head_size = 0;
+    while(currString != NULL && currString->str != NULL){
+        string_head_size++;
+        currString = currString->next;
+    }
+    if(string_head_size){
+        printf("\t.section\t.rodata\n");
+        currString = string_head;
+        while(currString != NULL){
+            printf(".LC%d:\n", currString->entries);
+            printf("\t.string\t%s\n", currString->str);
+            currString = currString->next;
+        }
+    }
+    // TEXT SECTION
+    printf("\t.text \n");
+    // initialize params list
+    param_list* params_head = param_list_initialize();
+    currST = globalST;
+    bool make_quad = false;
+    // iterate over the quadArray
+    currentQArray = quadArray;
+    
+    while(currentQArray != NULL && currentQArray->arr != NULL && currentQArray->count != 0){
+        int iterator = currentQArray->count;
+        if(label_count(iterator, _lablesRecord)){
+            int count = label_at(iterator, _lablesRecord)->value;
+            printf(".L%d: \n", 2 * _LabelCount + count + 2);
+        }
+        
+        char* op = printOP(currentQArray->arr->op);
+        char* arg1 = (currentQArray->arr->arg1 == NULL)?(NULL):(strdup(currentQArray->arr->arg1));
+        char* arg2 = (currentQArray->arr->arg2 == NULL)?(NULL):(strdup(currentQArray->arr->arg2));
+        char* result = (currentQArray->arr->result == NULL)?(NULL):(strdup(currentQArray->arr->result));
+        char* s = (arg2 == NULL)?(NULL):(strdup(arg2));
+        
+        // Activation Record of Result
+        char* result_ar;
+        if(search_global(result, _globalVars)){
+            // concatenate "(%rip)" to result
+            result_ar = (char*)malloc(sizeof(char)*(strlen(result)+7));
+            sprintf(result_ar, "%s(%%rip)", result);
+        }
+        else{
+            //convert result of search_ar(result, currST->_aRecord) to string and concatenate "(%rbp)" to it
+            int offset = search_ar(result, currST->_aRecord);
+            result_ar = (char*)malloc(sizeof(char)*15);
+            sprintf(result_ar, "%d(%%rbp)", offset);
+        }
+
+        // Activation Record of Arg1
+        char* arg1_ar;
+        if(search_global(arg1, _globalVars)){
+            // concatenate "(%rip)" to arg1
+            arg1_ar = (char*)malloc(sizeof(char)*(strlen(arg1)+7));
+            sprintf(arg1_ar, "%s(%%rip)", arg1);
+        }
+        else{
+            //convert result of search_ar(arg1, currST->_aRecord) to string and concatenate "(%rbp)" to it
+            int offset = search_ar(arg1, currST->_aRecord);
+            arg1_ar = (char*)malloc(sizeof(char)*15);
+            sprintf(arg1_ar, "%d(%%rbp)", offset);
+        }
+
+        // Activation Record of Arg2
+        char* arg2_ar;
+        if(search_global(arg2, _globalVars)){
+            // concatenate "(%rip)" to arg2
+            arg2_ar = (char*)malloc(sizeof(char)*(strlen(arg2)+7));
+            sprintf(arg2_ar, "%s(%%rip)", arg2);
+        }
+        else{
+            //convert result of search_ar(arg2, currST->_aRecord) to string and concatenate "(%rbp)" to it
+            int offset = search_ar(arg2, currST->_aRecord);
+            arg2_ar = (char*)malloc(sizeof(char)*15);
+            sprintf(arg2_ar, "%d(%%rbp)", offset);
+        }
+        
+        // parameter type
+        if(op == "param"){
+            // push arg1 to params_head
+            param_list_insert(params_head, result);
+        }
+        else{
+            printf("\t");
+            // Binary Operations
+            // Addition
+            if (op == "+") {
+                bool flag = true;
+                if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
+                    flag = false;
+                }
+                else{
+                    char* p;
+                    strtol(s, &p, 10);
+                    if(*p == 0)
+                        flag = true;
+                    else
+                        flag = false;
+                }
+                if(flag){
+                    printf("addl \t$%d, %s\n", atoi(arg2), arg1_ar);
+                }
+                else{
+                    // AMBIGIOUS
+                    printf("movl \t%s, %%eax\n", arg1_ar);
+                    printf("movl \t%s, %%edx\n", arg2_ar);
+                    printf("\taddl \t%%eax, %%eax\n");
+                    printf("\tmovl \t%%eax, %s\n", result_ar);
+                }
+            }
+            // Subtraction
+            else if (op == "-"){
+                printf("movl \t%s, %%eax\n", arg1_ar);
+                printf("movl \t%s, %%edx\n", arg2_ar);
+                printf("\tsubl \t%%edx, %%eax\n");
+                printf("\tmovl \t%%eax, %s\n", result_ar);
+            }
+            // multiplication
+            else if(op == "*"){
+                printf("movl \t%s, %%eax\n", arg1_ar);
+                bool flag = true;
+                if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
+                    flag = false;
+                }
+                else{
+                    char* p;
+                    strtol(s, &p, 10);
+                    if(*p == 0)
+                        flag = true;
+                    else
+                        flag = false;
+                }
+                if(flag){
+                    printf("# %s = %s * %s\n", result, arg1, arg2);
+                    printf("\timull \t$%d, %%eax\n", atoi(arg2));
+                    symboltable* tempTab = globalST;
+                    char* val;
+                    // check if arg1 is a global variable
+                    for(int i=0; i <tempTab->count; i++){ 
+                        if(strcmp((tempTab->table_entries[i])->name, arg1) == 0){
+                            val = strdup((tempTab->table_entries[i])->name);    // value found, propagate the name
+                        }
+                    }
+                }
+                else{
+                    printf("\timull \t%s, %%eax\n", arg2_ar);
+                    printf("\tmovl \t%%eax, %s\n", result_ar);
+                }
+            }
+            // division 
+            else if(op=="/"){
+                printf("movl \t%s, %%eax\n", arg1_ar);
+                printf("\tcltd\n");
+                printf("\tidivl \t%s\n", arg2_ar);
+                printf("\tmovl \t%%eax, %s\n", result_ar);
+            }
+            // modulo
+            else if(op=="\%"){
+                printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                printf("\tcltd\n");
+                printf("\tidivl \t%s\n", arg2_ar);
+                printf("\tmovl \t%%edx, %s\n", result_ar);
+            }
+            // assign
+            else if(op =="="){
+                if(make_quad == true){
+                    printf("\tmovq \t%s, %%rax\n", arg1_ar);
+                    printf("\tmovq \t%%rax, %s\n", result_ar);
+                    make_quad = false;
+                }
+                else{
+                    s = (arg1 == NULL)?(NULL):(strdup(arg1));
+                    bool flag = true;
+                    if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
+                        flag = false;
+                    }
+                    else{
+                        char* p;
+                        strtol(s, &p, 10);
+                        if(*p == 0)
+                            flag = true;
+                        else
+                            flag = false;
+                    }
+                    if(flag){
+                        printf("movl \t$%d, %%eax\n", atoi(arg1));
+                    }
+                    else{
+                        printf("movl \t%s, %%eax\n", arg1_ar);
+                    }
+                }
+            }
+            else if(op=="=str"){
+                printf("\tmovq \t$.LC%s, %s\n", arg1, result_ar);
+            }
+            // Relational
+            else if(op=="=="){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tje .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op=="!="){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tjne .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op=="<"){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tjl .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op==">"){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tjg .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op=="<="){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tjle .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op==">="){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                printf("\tjge .L%d\n", 2 * _LabelCount + tempCount + 2);
+            }
+            else if(op=="goto"){
+                if (result != NULL) {
+                    int tempCount = label_at(atoi(result), _lablesRecord)->value;
+                    printf("\tjmp .L%d\n", 2 * _LabelCount + tempCount + 2);
+                }
+            }
+
+            // Unary Operations
+            else if(op == "=&"){
+                printf("# %s = &%s\n", result, arg1);
+                printf("\tleaq\t%s, %%rax\n", arg1_ar);
+                printf("\tmovq \t%%rax, %s\n", result_ar);
+                make_quad = true;
+            }
+            else if(op=="=*"){
+                printf("# %s = *%s\n", result, arg1);
+                printf("\tmovq\t%s, %%rax\n", arg1_ar);
+                printf("\tmovl\t(%%rax), %%eax\n");
+                printf("\tmovl\t%%eax, %s\n", result_ar);
+            }
+            else if(op=="*="){
+                printf("# *%s = %s\n", result, arg1);
+                printf("movl\t%s, %%eax\n", result_ar);
+                printf("\tmovl\t%s, %%edx\n", arg1_ar);
+                // cout << "\tmovl\t%edx, (%eax)";
+                printf("\tmovl\t%%edx, (%%eax)\n");
+            }
+            else if(op=="uminus"){
+                printf("movl\t%s, %%eax\n", arg1_ar);
+                printf("\tnegl\t%%eax\n");
+                printf("\tmovl\t%%eax, %s\n", result_ar);
+            }
+            else if(op == "=[]"){
+                printf("# =[] operation ; ");
+                printf("%s = %s[%s]\n", result, arg1, arg2);
+                if(search_global(arg1, _globalVars)){
+                    printf("\tmovl\t%s, %%eax\n", arg2_ar);
+                    printf("\tmovslq\t%%eax, %%rdx\n");
+                    printf("\tleaq\t0(,%%rdx,4), %%rdx\n");
+                    printf("\tleaq\t%s, %%rax\n", arg1_ar);
+                    printf("\tmovl\t(%%rdx,%%rax), %%eax\n");
+                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                }
+                else{
+                    printf("\tmovl\t%s, %%ecx\n", arg2_ar);
+                    printf("\tmovl\t%d(%%rbp,%%rcx,4), %%eax\n", search_ar(arg1, currST->_aRecord));
+                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                }
+            }
+            else if(op=="[]="){
+                printf("# []= operation ; ");
+                printf("%s[%s] = %s\n", result, arg1, arg2);
+                if(search_global(result, _globalVars)){
+                    printf("\tmovl\t%s, %%eax\n", arg2_ar);
+                    printf("\tmovl\t%s, %%edx\n", arg1_ar);
+                    printf("\tmovslq\t%%edx, %%rdx\n");
+                    printf("\tleaq\t0(,%%rdx,4), %%rcx\n");
+                    printf("\tleaq\t%s, %%rdx\n", result_ar);
+                    printf("\tmovl\t%%eax, (%%rcx,%%rdx)\n");
+                }
+                else{
+                    printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                    printf("\tmovl\t%s, %%edx\n", arg2_ar);
+                    printf("\tmovl\t%%edx, %d(%%rbp,%%rax,4)\n", search_ar(result, currST->_aRecord));
+                }
+            }
+            else if(op=="return"){
+                if(result != NULL){
+                    printf("movl\t%s, %%eax\n", result_ar);
+                }
+                // jump to the end of the function -- epilogue
+                printf("\tjmp .LFE%d\n", _LabelCount);
+            }
+            else if(op=="param"){
+                // push arg1 to params_head
+                param_list_insert(params_head, result);
+            }
+
+            // function call
+            else if(op=="call"){
+                // 4 registers are used for passing parameters -- rdi, rsi, rdx, rcx
+                param_list* tempPara = params_head;
+                int i=0;
+                while(tempPara != NULL){
+                    if(i == 0){
+                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
+                        printf("\tmovq\t%d(%%rbp), %%rdi\n", search_ar(tempPara->param, currST->_aRecord));
+                    }
+                    else if (i==1){
+                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
+                        printf("\tmovq\t%d(%%rbp), %%rsi\n", search_ar(tempPara->param, currST->_aRecord));
+                    }
+                    else if (i==2){
+                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
+                        printf("\tmovq\t%d(%%rbp), %%rdx\n", search_ar(tempPara->param, currST->_aRecord));
+                    }
+                    else if (i==3){
+                        printf("movl\t%d(%%rbp), %%eax\n", search_ar(tempPara->param, currST->_aRecord));
+                        printf("\tmovq\t%d(%%rbp), %%rcx\n", search_ar(tempPara->param, currST->_aRecord));
+                    }
+                    else{
+                        printf("\tmovq\t%d(%%rbp), %%rdi\n", search_ar(tempPara->param, currST->_aRecord));
+                    }
+                    i++;
+                    tempPara = tempPara->next;
+                }
+                // clear para stack
+                params_head = param_list_delete(params_head);
+                printf("\tcall\t%s\n", arg1);
+                printf("\tmovl\t%%eax, %s\n", result_ar);
+            }
+            else if(op == "function"){
+                // function begins -- prologue
+                printf(".globl\t%s\n", result);
+                printf("\t.type\t%s, @function\n", result);
+                printf("%s: \n", result);
+                printf(".LFB%d: \n", _LabelCount);
+                printf("\t.cfi_startproc\n");
+                printf("\tpushq\t%%rbp\n");
+                printf("\t.cfi_def_cfa_offset 8\n");
+                printf("\t.cfi_offset 5, -8\n");
+                printf("\tmovq\t%%rsp, %%rbp\n");
+                printf("\t.cfi_def_cfa_register 5\n");
+                currST = lookup(globalST, result)->next;
+                // get last entry of the symbol table
+                symboltableentry* lastEntry = currST->table_entries[currST->count-1];
+                // printf("\n\nLAST ENTRY: %s\n\n", lastEntry->name);
+                // printf("\n\nLAST ENTRY SIZE: %d\n\n", lastEntry->size);
+                // printf("\n\nLAST ENTRY OFFSET: %d\n\n", lastEntry->offset);
+                // get the size of the symbol table
+                int sizeTemp = lastEntry->offset + lastEntry->size;
+                // rsp register holds the address of the top of the stack
+                printf("\tsubq\t$%d, %%rsp\n", sizeTemp);  // MAX BUFFER: 4 Para + retVal + RA = 24 = (4+1+1)*4
+
+                // function table -- paramaters section
+                for(int i=0; i < currST->paramCount; i++){
+                    symboltableentry* entry = currST->_argList[i];
+                    if(i==0){
+                        printf("\tmovq\t%%rdi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                    }
+                    else if(i==2){
+                        printf("\tmovq\t%%rsi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                    }
+                    else if(i==3){
+                        printf("\tmovq\t%%rdx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                    }
+                    else if(i==4){
+                        printf("\tmovq\t%%rcx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                    }
+                }
+            }
+            // function end -- epilogue
+            else if(op=="end"){
+                printf(".LFE%d: \n", _LabelCount++);
+                printf("leave\n");
+                printf("\t.cfi_restore 5\n");
+                printf("\t.cfi_def_cfa 4, 4\n");
+                printf("\tret\n");
+                printf("\t.cfi_endproc\n");
+                printf("\t.size\t%s, .-%s\n", result, result);
+            }
+            else{
+                printf("op: %s\n", op);
+            }
+            printf("\n");
+        }
+        currentQArray = currentQArray->nextQuad;
+    }
+    // footer
+    printf("\t.ident\t\"group-03-julius-stabs-back\"\n");
+    printf("\t.section\t.note.GNU-stack,\"\",@progbits\n");
+}
+
+
 /**************************************************************************/
 /*                        SYMBOL TABLE FUNCTIONS                          */
 /**************************************************************************/
@@ -261,7 +1032,7 @@ int get_size(symboltype* type){
         case TYPE_STRING:
             return type->width;
         case TYPE_FUNC:
-            return 0;
+            return size_of_pointer;
     }
 }
 
@@ -310,6 +1081,8 @@ char* printCategory(enum category_enum category){
             return "temp";
         case TYPE_FUNCTION:
             return "function";
+        case TYPE_RETURN:
+            return "retVal";
         default:
             return "NULL";
     }
@@ -320,7 +1093,10 @@ int typecheck(symboltype* type1, symboltype* type2){
     if(type1 == NULL && type2 == NULL){
         return 0;
     }
-    if(type1->type == type2->type){
+    else if(type1 == NULL || type2 == NULL){
+        return 0;
+    }
+    else if(type1->type == type2->type){
         if(type1->type == TYPE_ARRAY || type1->type == TYPE_PTR){
             return typecheck(type1->ptr, type2->ptr);
         }
@@ -389,6 +1165,10 @@ symboltable* create_symboltable(char* name, symboltable* parent){
     newST->_retVal = NULL;
     newST->next = NULL;
     newST->returnLabel = 0;
+    // hash table initialization
+    for(int i=0; i<MAX_HASH_AR; i++){
+        newST->_aRecord[i] = NULL;
+    }
     return newST;
 }
 
@@ -473,7 +1253,7 @@ void print_ST(symboltable *currST){
     printf("\n\n==================================================================================================================\n");
     (currST->parent) ? printf("Symbol Table: %-50s Parent: ST.%s\n", currST->name, currST->parent->name) : printf("Symbol Table: %-35s Parent: NULL\n", currST->name);
     printf("------------------------------------------------------------------------------------------------------------------\n");
-    printf("%-15s%-15s%-20s%-20s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Nested Table");
+    printf("%-15s%-15s%-20s%-20s%-15s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Offset", "Nested Table");
     printf("------------------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
@@ -482,7 +1262,7 @@ void print_ST(symboltable *currST){
         printf("%-20s", printCategory(entry->category));
         (entry->initial_value) ? printf("%-20s", entry->initial_value) : printf("%-20s", "-");
         printf("%-15d", entry->size);
-        // printf("%-15s", "-");
+        printf("%-15d", entry->offset); // offset is not updated
         if(entry->next != NULL){
             printf("%-20s\n", entry->next->name);
         }
@@ -496,11 +1276,25 @@ void print_ST(symboltable *currST){
     // print the nested symbol tables
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
-        if(entry->next != NULL && entry->category == TYPE_FUNC){
+        if(entry->next != NULL && entry->category == TYPE_FUNCTION){
             print_ST(entry->next);
             printf("\n");
         }
     }
+}
+
+// Set Offsets after table is generated 
+void set_offset(symboltable* currST){
+    int offset = 0;
+    for(int i=0; i< currST->count; i++){
+        symboltableentry* entry = (currST->table_entries[i]);
+        if(entry->category == TYPE_FUNCTION){
+            set_offset(entry->next);
+        }
+        entry->offset = offset;
+        offset += entry->size;
+    }
+    return;
 }
 
 /**************************************************************************/
@@ -562,6 +1356,8 @@ char* printOP(enum op_code op){
             return "function";
         case OP_LABEL:
             return "label";
+        case OP_ENDFUNC:
+            return "end";
         default:
             return "NULL";
     }
@@ -708,6 +1504,10 @@ int nextInstr(){
 }
 
 int main(){
+    for(int i = 0; i < MAX_HASH_LABEL; i++){
+        _lablesRecord[i] = NULL;
+        _globalVars[i] = NULL;
+    }
     printf("Initializing Symbol Tables\n");
     globalST = create_symboltable("Global", NULL);
     currST = globalST;
@@ -719,9 +1519,16 @@ int main(){
     // gentemp update test
     printf("Starting Parser\n");
     yyparse();
+    set_offset(globalST);
+    gen_activation_record(globalST);
+    printf("\n\n\nActivation Record:\n");
+    print_activationRecord(globalST);
     printf("Global Symbol Table:\n");
     print_ST(globalST);
     printf("\n\n\n");
     print_quadArray(quadArray);
+    printf("\n\n\n");
+    printf("x86:\n");
+    tac2x86();
     return 0;
 }

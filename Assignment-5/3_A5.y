@@ -728,9 +728,11 @@ direct_declarator : IDENTIFIER {
                             // return type is that of func_ID
                             enum symboltype_enum tempReturn = $1->type->type;
 
-                            update_type($1, create_symboltype(TYPE_FUNC, 1, NULL));
+                            // update_type($1, create_symboltype($1->type->type, 1, NULL));
 
-                            $1->category = TYPE_FUNC;
+                            $1->category = TYPE_FUNCTION;
+                            // all functions are of size size_of_pointer
+                            $1->size = size_of_pointer;
                             // create a new symbol table for the function
                             // currST->name = $1->name;
                             // link the symbol table to the global symbol table
@@ -743,6 +745,7 @@ direct_declarator : IDENTIFIER {
                                 symboltableentry* storeReturn = lookup(currST, "retValue");
                                 update_type(storeReturn, create_symboltype(tempReturn, 1, NULL));
                                 currST->_retVal = storeReturn->type;
+                                storeReturn->category = TYPE_RETURN;
                             }
                             // keep an instance
                             // Reducing function name and parameter list to direct_declarator.
@@ -767,8 +770,14 @@ pointer : ASTERISK {
             }
         ;
 
-parameter_list : parameter_declaration {printf("parameter-list\n");}
-               | parameter_list COMMA parameter_declaration {printf("parameter-list\n");}
+parameter_list : parameter_declaration 
+                    {
+                        printf("parameter-list\n");
+                    }
+               | parameter_list COMMA parameter_declaration 
+                    {
+                        printf("parameter-list\n");
+                    }
                ;
 
 parameter_declaration : type_specifier pointer_opt identifier_opt {
@@ -893,6 +902,7 @@ expression_statement : expression_opt SEMICOLON {
 
 expression_opt : expression {
                     $$ = $1;
+                    $$->returnLabel = 0;
                 }
                | {
                     $$ = create_expression();
@@ -958,6 +968,18 @@ jump_statement : RETURN expression_opt SEMICOLON {
                             // emit the code for return
                             emit(OP_RETURN_VOID, NULL, NULL, NULL);
                         }
+                        /*
+                        else if($2->arrBase->type->type == TYPE_FUNC){
+                            // typecheck the return type of function
+                            if(!typecheck(currST->_retVal, $2->loc->next->_retVal)){
+                                // return type mismatch
+                                yyerror("Return type mismatch with Function type");
+                            }
+                            $$ = create_statement();
+                            // emit the code for return
+                            emit(OP_RETURN, NULL, NULL, $2->loc->name);
+                        }
+                        */
                         else{
                             // return statement with expression
                             // check that the expression type is same as function return type
@@ -974,12 +996,24 @@ jump_statement : RETURN expression_opt SEMICOLON {
                ;
 
 /* TRANSLATION UNIT */
-translation_unit : external_declaration {printf("translation-unit\n");}
-                 | translation_unit external_declaration {printf("translation-unit\n");}
+translation_unit : external_declaration 
+                    {
+                        printf("translation-unit\n");
+                    }
+                 | translation_unit external_declaration 
+                    {
+                        printf("translation-unit\n");
+                    }
                  ;
 
-external_declaration : declaration {printf("external-declaration\n");}
-                     | function_definition {printf("external-declaration\n");}
+external_declaration : declaration 
+                        {
+                            printf("external-declaration\n");
+                        }
+                     | function_definition 
+                        {
+                            printf("external-declaration\n");
+                        }
                      ;
 
 function_definition : type_specifier declarator switch_table compound_statement {
