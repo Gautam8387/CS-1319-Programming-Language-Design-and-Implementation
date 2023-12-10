@@ -558,7 +558,7 @@ void tac2x86(FILE* file){
             temp = temp->next;
         }
     }
-    // begin the .s file here
+    // begin the .asm file here
     for(int i=0; i< globalST->count; i++){
         symboltableentry* entry = (globalST->table_entries[i]);
         if(entry->category != TYPE_FUNCTION){
@@ -1540,17 +1540,19 @@ int main(int argc, char** argv){
     // remove the extension
     printf("Starting Compiler\n");
     int dot_at = strlen(inname)-3;
-    char* outname = (char*)malloc(sizeof(char)*dot_at+1);
-    for(int i=0; i!=dot_at; i++){
-        outname[i] = inname[i];
-    }
-    outname[dot_at] = '\0';
+    char outname = inname[strlen(inname)-4]; // = (char*)malloc(sizeof(char)*dot_at+1);
+    // for(int i=0; i!=dot_at; i++){
+    //     outname[i] = inname[i];
+    // }
+    outname = inname[dot_at-1];
     printf("Input File: %s\n", inname);
-    
+    printf("Test Case: %c\n", outname);
+
     for(int i = 0; i < MAX_HASH_LABEL; i++){
         _lablesRecord[i] = NULL;
         _globalVars[i] = NULL;
     }
+
     printf("Initializing Symbol Tables\n");
     globalST = create_symboltable("Global", NULL);
     currST = globalST;
@@ -1578,9 +1580,14 @@ int main(int argc, char** argv){
 
     if(strcmp(argv[1], "1") == 0){
         printf("Writing TACs\n");
+
         // open file for writing outname.out
-        char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
-        sprintf(outname_out, "%s.out", outname);
+        char* temp_o = "3_A5_quads";
+        char* extension_out = (char*)malloc(sizeof(char)*6);
+        sprintf(extension_out, "%c.out", outname);
+        char* outname_out = (char*)malloc(sizeof(char)*25);
+        sprintf(outname_out, "%s%s", temp_o, extension_out);
+
         FILE* file_out = fopen(outname_out, "w");
         if (!file_out) {
             perror("Error opening file");
@@ -1599,9 +1606,15 @@ int main(int argc, char** argv){
 
     if(strcmp(argv[1], "2") == 0){
         printf("Writing TACs\n");
+
         // open file for writing outname.out
-        char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
-        sprintf(outname_out, "%s.out", outname);
+        char* temp_o = "3_A5_quads";
+        char* extension_out = (char*)malloc(sizeof(char)*6);
+        sprintf(extension_out, "%c.out", outname);
+        char* outname_out = (char*)malloc(sizeof(char)*25);
+        sprintf(outname_out, "%s%s", temp_o, extension_out);
+        printf("HELLO\n");
+
         FILE* file_out = fopen(outname_out, "w");
         if (!file_out) {
             perror("Error opening file");
@@ -1617,9 +1630,14 @@ int main(int argc, char** argv){
         // close file
         fclose(file_out);
         printf("Generating ASM\n");
+
         // open file for writing outname.asm
-        char* outname_asm = (char*)malloc(sizeof(char)*strlen(outname)+5);
-        sprintf(outname_asm, "%s.s", outname);
+        char* temp_s = "3_A5_quads";
+        char* extension_asm = (char*)malloc(sizeof(char)*4);
+        sprintf(extension_asm, "%c.asm", outname);
+        char* outname_asm = (char*)malloc(sizeof(char)*25);
+        sprintf(outname_asm, "%s%s", temp_s, extension_asm);
+
         FILE* file_asm = fopen(outname_asm, "w");
         if (!file_asm) {
             perror("Error opening file");
