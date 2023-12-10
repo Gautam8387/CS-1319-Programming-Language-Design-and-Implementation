@@ -1,6 +1,5 @@
 #include "myl.h"
 #include <unistd.h>
-#include <stdlib.h>
 
 /*
 Function to print a string 
@@ -28,14 +27,12 @@ We go through the following steps:
 2. Convert the integer to a character array (string) in reverse order
 3. Reverse the string if it's a negative number
 4. Use the write system call to print the integer string to STDOUT
-5. Free the dynamically allocated memory
 */
 int printInt(int num) {
-    char *buffer;
+    char buffer[100];
     int index = 0;
 	int bytes;
 
-    buffer = (char *)malloc(100 * sizeof(char));
     if (buffer == NULL) {
         return ERR;
     }
@@ -81,8 +78,6 @@ int printInt(int num) {
     // Use the write system call to print the integer string to STDOUT
     write(1, buffer, bytes);
 
-    free(buffer);
-
     return bytes;
 }
 
@@ -93,15 +88,11 @@ We go through the following steps:
 2. Read one character at a time from STDIN to the buffer
 3. Check for invalid characters and set error flag if necessary
 4. Convert the character array (string) to an integer
-5. Free the dynamically allocated memory
 */
 int readInt(int *error) {
     char buffer[1];
-    char *numStr;
+    char numStr[100];
     int num = 0, len = 0, i;
-
-    // Allocate dynamic memory for the numStr buffer
-    numStr = (char *)malloc(20 * sizeof(char));
 
     if (numStr == NULL) {
         // Handle memory allocation failure
@@ -127,7 +118,6 @@ int readInt(int *error) {
     // Check for invalid length or empty input
     if (len > 9 || len == 0) {
         *error = ERR;
-        free(numStr);  // Free the dynamically allocated memory before returning
         return 0;
     }
 
@@ -136,7 +126,6 @@ int readInt(int *error) {
         if (len == 1) {
             // Set error flag if there is only a minus sign without digits
             *error = ERR;
-            free(numStr);  // Free the dynamically allocated memory before returning
             return 0;
         }
         for (i = 1; i < len; i++) {
@@ -159,7 +148,5 @@ int readInt(int *error) {
             num += (int)(numStr[i] - '0');
         }
     }
-    // Free the dynamically allocated memory
-    free(numStr);
     return num;
 }

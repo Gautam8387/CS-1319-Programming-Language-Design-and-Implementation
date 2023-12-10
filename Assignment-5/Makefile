@@ -17,7 +17,7 @@ test-nc: compiler
 	gcc 3_A5.o -o 3_A5 -L. -lmyl -no-pie
 
 clean:
-	rm -f compiler lex.yy.c 3_A5.tab.c 3_A5_translator.tab.h test.tac 3_A5.tab.o 3_A5.tab.h libmyl.a myl.o 3_A5 3_A5.o 3_A5.s 3_A5.tac
+	rm -f compiler lex.yy.c 3_A5.tab.c 3_A5_translator.tab.h test.tac 3_A5.tab.o 3_A5.tab.h libmyl.a myl.o 3_A5 3_A5.o 3_A5.s 3_A5.out
 	
 test-all: compiler
 	python3 test-cases.py	

@@ -1096,6 +1096,6 @@ switch_table : {
 /* C Code for functions */
 
 void yyerror(char *s) {
-    // printf("Error: %s on '%s' at line %d\n", s, yytext, yylineno);
+    printf("Error: %s on '%s' at line %d\n", s, yytext, yylineno);
     exit(1);
 }
