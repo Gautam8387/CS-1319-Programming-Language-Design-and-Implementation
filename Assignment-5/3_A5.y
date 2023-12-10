@@ -111,10 +111,10 @@ primary_expression : IDENTIFIER {
                             // new expression
                             $$ = create_expression();
                             $$->loc = $1;
-                            printf("primary-expression\n");
+                            // printf("primary-expression\n");
                         }
                    | constant {
-                            printf("primary-expression\n");
+                            // printf("primary-expression\n");
                             $$ = $1;
                         }
                    | STRING_LITERAL {
@@ -127,17 +127,17 @@ primary_expression : IDENTIFIER {
                             // calculate length of string_head
                             int length = ll_length(string_head);
                             length = length - 1;
-                            printf("\n\nLENGTH %d\n\n", length);
+                            // printf("\n\nLENGTH %d\n\n", length);
                             // convert to string
                             char* tempLength = (char*)malloc(sizeof(char)*10);
                             sprintf(tempLength, "%d", length);
                             // emit the results, set size of linked list
                             emit(OP_ASSIGN_STR, tempLength, NULL, $$->loc->name);
-                            printf("primary-expression\n");
+                            // printf("primary-expression\n");
                         }
                    | L_PARENTHESIS expression R_PARENTHESIS {
                             $$ = $2;
-                            printf("primary-expression\n");
+                            // printf("primary-expression\n");
                         }
                    ;
 
@@ -161,7 +161,7 @@ constant : INTEGER_CONSTANT {
 postfix_expression : primary_expression {
                             $$ = $1;
                             $$->arrBase = $1->loc;  // set the array base to the location of the primary expression
-                            printf("postfix-expression\n");
+                            // printf("postfix-expression\n");
                         }
                    | postfix_expression L_BOX_BRACKET expression R_BOX_BRACKET {
                             $$ = create_expression();
@@ -170,7 +170,7 @@ postfix_expression : primary_expression {
                             $$->loc = $3->loc;
                             // set the array base to the location of the postfix expression
                             $$->arrBase = $1->loc;
-                            printf("postfix-expression\n");
+                            // printf("postfix-expression\n");
                         }
                    | postfix_expression L_PARENTHESIS argument_expression_list_opt R_PARENTHESIS {
                             // This is a function call
@@ -202,12 +202,12 @@ postfix_expression : primary_expression {
                                 sprintf(temp2, "%s%s", temp, $1->loc->name);
                                 yyerror(temp2);
                             }
-                            printf("postfix-expression\n");
+                            // printf("postfix-expression\n");
                         }
                    | postfix_expression ARROW IDENTIFIER {
                             // we do not have any structs or classes in our language.
                             $$ = $1;
-                            printf("postfix-expression\n");
+                            // printf("postfix-expression\n");
                         }
                    ;
 
@@ -225,20 +225,20 @@ argument_expression_list : assignment_expression {
                                 $$ = 1;
                                 // emit the code for parameter
                                 emit(OP_PARAM, NULL, NULL, $1->loc->name);
-                                printf("argument-expression-list\n");
+                                // printf("argument-expression-list\n");
                             }
                          | argument_expression_list COMMA assignment_expression {
                                 // this is a list of parameters
                                 $$ = $1 + 1;
                                 // emit the code for parameter
                                 emit(OP_PARAM, NULL, NULL, $3->loc->name);
-                                printf("argument-expression-list\n");
+                                // printf("argument-expression-list\n");
                             }
                          ;
 
 unary_expression : postfix_expression {
                         $$ = $1;
-                        printf("unary-expression\n");
+                        // printf("unary-expression\n");
                     }
                  | unary_operator unary_expression {
                         // this is rule used for unary operators preceding a postfix expression
@@ -250,7 +250,7 @@ unary_expression : postfix_expression {
                             /*
                             if($2->isArray){
                                 // first get arr[i] and then &arr[i]
-                                // printf("\n\n RUNNN \n\n");
+                                // // printf("\n\n RUNNN \n\n");
                                 $$->loc = gentemp(create_symboltype(TYPE_PTR, 1, $2->loc->type), NULL);
                                 emit(OP_ASSIGN_BOX, $2->arrBase->name, $2->loc->name, $$->loc->name);
                                 $$->isPtr = true;
@@ -303,29 +303,29 @@ unary_expression : postfix_expression {
                                 yyerror(temp);
                             }
                         }
-                        printf("unary-expression\n");
+                        // printf("unary-expression\n");
                     }
                  ;
 
 unary_operator : AMPERSAND {
                         $$ = "&";
-                        printf("unary-operator\n");
+                        // printf("unary-operator\n");
                     }
                | ASTERISK {
                         $$ = "*";
-                        printf("unary-operator\n");
+                        // printf("unary-operator\n");
                     }
                | PLUS {
                         $$ = "+";
-                        printf("unary-operator\n");
+                        // printf("unary-operator\n");
                     }
                | MINUS {
                         $$ = "-";
-                        printf("unary-operator\n");
+                        // printf("unary-operator\n");
                     }
                | EXCLAMATION {
                         $$ = "!";
-                        printf("unary-operator\n");
+                        // printf("unary-operator\n");
                     }
                ;
 
@@ -346,7 +346,7 @@ multiplicative_expression : unary_expression {
                                         $$ = $1;
                                         $$->loc = $1->arrBase;
                                     }
-                                    printf("multiplicative-expression\n");
+                                    // printf("multiplicative-expression\n");
                                 }
                           | multiplicative_expression ASTERISK unary_expression {
                                     // check if both expressions are of same type or need conversion
@@ -361,7 +361,7 @@ multiplicative_expression : unary_expression {
                                         // conversion ???
                                         yyerror("Type mismatch in multiplicative MULT expression");
                                     }
-                                    printf("multiplicative-expression\n");
+                                    // printf("multiplicative-expression\n");
                                 }
                           | multiplicative_expression DIV unary_expression {
                                     if(typecheck($1->loc->type, $3->arrBase->type)){
@@ -375,7 +375,7 @@ multiplicative_expression : unary_expression {
                                         // conversion ???
                                         yyerror("Type mismatch in multiplicative DIV expression");
                                     }
-                                    printf("multiplicative-expression\n");
+                                    // printf("multiplicative-expression\n");
                                 }
                           | multiplicative_expression MOD unary_expression {
                                     if(typecheck($1->loc->type, $3->arrBase->type)){
@@ -389,13 +389,13 @@ multiplicative_expression : unary_expression {
                                         // conversion ???
                                         yyerror("Type mismatch in multiplicative MOD expression");
                                     }
-                                    printf("multiplicative-expression\n");
+                                    // printf("multiplicative-expression\n");
                                 }
                           ;
 
 additive_expression : multiplicative_expression {
                             $$ = $1;
-                            printf("additive-expression\n");
+                            // printf("additive-expression\n");
                         }
                     | additive_expression PLUS multiplicative_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -409,7 +409,7 @@ additive_expression : multiplicative_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in additive PLUS expression");
                             }
-                            printf("additive-expression\n");
+                            // printf("additive-expression\n");
                         }
                     | additive_expression MINUS multiplicative_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -423,13 +423,13 @@ additive_expression : multiplicative_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in additive MINUS expression");
                             }
-                            printf("additive-expression\n");
+                            // printf("additive-expression\n");
                         }
                     ; 
 
 relational_expression : additive_expression {
                                 $$ = $1;
-                                printf("relational-expression\n");
+                                // printf("relational-expression\n");
                             }
                       | relational_expression LESS_THAN additive_expression {
                             // type check 
@@ -449,7 +449,7 @@ relational_expression : additive_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in relational LESS_THAN expression");
                             }
-                            printf("relational-expression\n");
+                            // printf("relational-expression\n");
                         }
                       | relational_expression GREATER_THAN additive_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -468,7 +468,7 @@ relational_expression : additive_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in relational GREATER_THAN expression");
                             }
-                            printf("relational-expression\n");
+                            // printf("relational-expression\n");
                         }
                       | relational_expression LESS_THAN_EQUAL additive_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -487,7 +487,7 @@ relational_expression : additive_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in relational LESS_THAN_EQUAL expression");
                             }
-                            printf("relational-expression\n");
+                            // printf("relational-expression\n");
                         }
                       | relational_expression GREATER_THAN_EQUAL additive_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -506,13 +506,13 @@ relational_expression : additive_expression {
                                 // conversion ???
                                 yyerror("Type mismatch in relational GREATER_THAN_EQUAL expression");
                             }
-                            printf("relational-expression\n");
+                            // printf("relational-expression\n");
                         }
                       ;
 
 equality_expression : relational_expression {
                             $$ = $1;
-                            printf("equality-expression\n");
+                            // printf("equality-expression\n");
                         }
                     | equality_expression IS_EQUAL relational_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -527,7 +527,7 @@ equality_expression : relational_expression {
                                 emit(OP_EQUALS, $1->loc->name, $3->loc->name, NULL);
                                 emit(OP_GOTO, NULL, NULL, NULL);
                             }
-                            printf("equality-expression\n");
+                            // printf("equality-expression\n");
                         }
                     | equality_expression NOT_EQUAL relational_expression {
                             if(typecheck($1->loc->type, $3->loc->type)){
@@ -542,13 +542,13 @@ equality_expression : relational_expression {
                                 emit(OP_NOT_EQUALS, $1->loc->name, $3->loc->name, NULL);
                                 emit(OP_GOTO, NULL, NULL, NULL);
                             }
-                            printf("equality-expression\n");
+                            // printf("equality-expression\n");
                         }
                     ;
 
 logical_and_expression : equality_expression {
                                 $$ = $1;
-                                printf("logical-AND-expression\n");
+                                // printf("logical-AND-expression\n");
                             }
                        | logical_and_expression LOGICAL_AND N equality_expression {
                                 $4 = int2bool($4);
@@ -559,13 +559,13 @@ logical_and_expression : equality_expression {
                                 backpatch($1->trueList, $3);
                                 $$->trueList = $4->trueList;
                                 $$->falseList = merge($1->falseList, $4->falseList);
-                                printf("logical-AND-expression\n");
+                                // printf("logical-AND-expression\n");
                             }
                        ;
 
 logical_or_expression : logical_and_expression {
                                 $$=$1;
-                                printf("logical-OR-expression\n");
+                                // printf("logical-OR-expression\n");
                             }
                       | logical_or_expression LOGICAL_OR N logical_and_expression {
                                 $4 = int2bool($4);
@@ -576,13 +576,13 @@ logical_or_expression : logical_and_expression {
                                 backpatch($1->falseList, $3);
                                 $$->trueList = merge($1->trueList, $4->trueList);
                                 $$->falseList = $4->falseList;
-                                printf("logical-OR-expression\n");
+                                // printf("logical-OR-expression\n");
                             }
                       ;
 
 conditional_expression : logical_or_expression {
                                 $$ = $1;
-                                printf("conditional-expression\n");
+                                // printf("conditional-expression\n");
                             }
                        | logical_or_expression M QUESTION N expression M COLON N conditional_expression {
                                 $$->loc = gentemp($5->loc->type, NULL);
@@ -602,13 +602,13 @@ conditional_expression : logical_or_expression {
                                 backpatch($1->falseList, $8);
                                 backpatch(tempList, nextInstr());
 
-                                printf("conditional-expression\n");
+                                // printf("conditional-expression\n");
                             }
                        ;
 
 assignment_expression : conditional_expression {
                                 $$ = $1;
-                                printf("assignment-expression\n");
+                                // printf("assignment-expression\n");
                             }
                       | unary_expression ASSIGN assignment_expression {
                                 // check array
@@ -626,13 +626,13 @@ assignment_expression : conditional_expression {
                                     emit(OP_ASSIGN, $3->loc->name, NULL, $1->arrBase->name);
                                 }
                                 $$ = $3;
-                                printf("assignment-expression\n");
+                                // printf("assignment-expression\n");
                             }
                       ;
 
 expression : assignment_expression {
                     $$ = $1;
-                    printf("expression\n");
+                    // printf("expression\n");
                 }
            ;
 
@@ -641,7 +641,7 @@ expression : assignment_expression {
 declaration : type_specifier init_declarator SEMICOLON {
                     // Reducing function_definition to declaration, move the new symbol table pointer NULL.
 		            new_ST = NULL;
-                    printf("declaration\n");
+                    // printf("declaration\n");
                 }
             ;
 
@@ -653,7 +653,7 @@ init_declarator : declarator {
                                 $1->initial_value = "0";
                             }
                         }
-                        printf("init-declarator\n");
+                        // printf("init-declarator\n");
                     }
                 | declarator ASSIGN initializer {
                         // check if a value exist in initializer
@@ -664,20 +664,20 @@ init_declarator : declarator {
                                 update_type($3, $1->type);
                             }
                         emit(OP_ASSIGN, $3->name, NULL, $1->name);
-                        printf("init-declarator\n"); 
+                        // printf("init-declarator\n"); 
                     }
                 ;
 
 type_specifier : VOID {
-                        printf("type-specifier\n");
+                        // printf("type-specifier\n");
                         push(&var_type, TYPE_VOID);
                     }
                | CHARACTER {
-                        printf("type-specifier\n");
+                        // printf("type-specifier\n");
                         push(&var_type, TYPE_CHAR);
                     }
                | INTEGER {
-                        printf("type-specifier\n");
+                        // printf("type-specifier\n");
                         push(&var_type, TYPE_INT);
                     }
                ;
@@ -690,7 +690,7 @@ declarator : pointer_opt direct_declarator {
                             temp->ptr = $2->type;
                             /*
                             if ($2->type->type == TYPE_ARRAY){
-                                printf("\n TYPE %d and %d and %d\n", temp->type, temp->ptr->type, temp->ptr->ptr->type);
+                                // printf("\n TYPE %d and %d and %d\n", temp->type, temp->ptr->type, temp->ptr->ptr->type);
                             }
                             */
                             update_type($2, temp);
@@ -702,7 +702,7 @@ declarator : pointer_opt direct_declarator {
                         }
                     }
                     $$ = $2;
-                    printf("declarator\n");
+                    // printf("declarator\n");
                 }
            ;
 
@@ -716,7 +716,7 @@ direct_declarator : IDENTIFIER {
                             // typeentry
                             update_type($1, create_symboltype(pop(&var_type), 1, NULL));
                             $$ = $1;
-                            printf("direct-declarator\n");
+                            // printf("direct-declarator\n");
                         }
                   | IDENTIFIER L_BOX_BRACKET INTEGER_CONSTANT R_BOX_BRACKET {
                             $1 = lookup(currST, $1->name);
@@ -724,9 +724,9 @@ direct_declarator : IDENTIFIER {
                             update_type($1, create_symboltype(pop(&var_type), 1, NULL));
                             // set array flag
                             update_type($1, create_symboltype(TYPE_ARRAY, atoi($3), $1->type));
-                            // printf("\nNAME %s and WIDTH %d\n", $1->name, $1->type->width);
+                            // // printf("\nNAME %s and WIDTH %d\n", $1->name, $1->type->width);
                             $$ = $1;
-                            printf("direct-declarator\n");
+                            // printf("direct-declarator\n");
                         }
                   | func_ID L_PARENTHESIS new_table parameter_list_opt R_PARENTHESIS {
                             // this is where the function is defined and new symbol table is created for 
@@ -759,11 +759,11 @@ direct_declarator : IDENTIFIER {
                             // This will be reduced to type_specifier declarator {block_item_list_opt}.
                             // need an instance of current symbol table for block_item_list_opt
                             new_ST = currST;
-                            // printf("\n\nName %s\n\n",new_ST->name);
+                            // // printf("\n\nName %s\n\n",new_ST->name);
                             currST = globalST;
-                            // printf("\n\nName %s\n\n",currST->name);
+                            // // printf("\n\nName %s\n\n",currST->name);
                             $$ = $1;
-                            printf("direct-declarator\n");
+                            // printf("direct-declarator\n");
                         }
                   ;
 
@@ -773,17 +773,17 @@ parameter_list_opt : parameter_list
 
 pointer : ASTERISK {
                 $$ = "*";
-                printf("pointer\n");
+                // printf("pointer\n");
             }
         ;
 
 parameter_list : parameter_declaration 
                     {
-                        printf("parameter-list\n");
+                        // printf("parameter-list\n");
                     }
                | parameter_list COMMA parameter_declaration 
                     {
-                        printf("parameter-list\n");
+                        // printf("parameter-list\n");
                     }
                ;
 
@@ -822,7 +822,7 @@ parameter_declaration : type_specifier pointer_opt identifier_opt {
                                     push_args(currST, tempPara);
                                 }
                                 */
-                                printf("parameter-declaration\n");
+                                // printf("parameter-declaration\n");
                             }
                       ;
 
@@ -832,7 +832,7 @@ identifier_opt : IDENTIFIER {$$ = $1;}
 
 initializer : assignment_expression {
                     $$ = $1->loc;
-                    printf("initializer\n");
+                    // printf("initializer\n");
                 }
             ;
 
@@ -840,35 +840,35 @@ initializer : assignment_expression {
 statement : compound_statement {
                     // This is the Block. It contains a list of statements
                     $$ = $1;
-                    printf("statement\n");
+                    // printf("statement\n");
                 }
           | expression_statement {
                     // Expressions -- Assignment, Function Call, Operations, etc.
                     $$ = create_statement();
                     $$->nextList = $1->nextList;
-                    printf("statement\n");
+                    // printf("statement\n");
                 }
           | selection_statement {
                     // If-Else, conditional
                     $$ = $1;
-                    printf("statement\n");
+                    // printf("statement\n");
                 }
           | iteration_statement {
                     // For Koop
                     $$ = $1;
-                    printf("statement\n");
+                    // printf("statement\n");
                 }
           | jump_statement {
                     // This is a return statement
                     $$ = $1;
                     update_return_ST(currST, 1);
-                    printf("statement\n");
+                    // printf("statement\n");
                 }
           ;
 
 compound_statement : L_CURLY_BRACE block_item_list_opt R_CURLY_BRACE {
                             $$ = $2;
-                            printf("compound-statement\n");
+                            // printf("compound-statement\n");
                         }
                    ;
 
@@ -882,28 +882,28 @@ block_item_list_opt : block_item_list {
 
 block_item_list : block_item {
                         $$ = $1;
-                        printf("block-item-list\n");
+                        // printf("block-item-list\n");
                     }
                 | block_item_list N block_item {
                         $$ = $3;
                         backpatch($1->nextList, $2);                        
-                        printf("block-item-list\n");
+                        // printf("block-item-list\n");
                     }
                 ;   
 
 block_item : declaration {
                     $$ = create_statement();
-                    printf("block-item\n");
+                    // printf("block-item\n");
                 }
            | statement {
                     $$ = $1;
-                    printf("block-item\n");
+                    // printf("block-item\n");
                 }
            ;
 
 expression_statement : expression_opt SEMICOLON {
                             $$ = $1;
-                            printf("expression-statement\n");
+                            // printf("expression-statement\n");
                         }
                      ;
 
@@ -924,10 +924,10 @@ selection_statement : IF L_PARENTHESIS expression M R_PARENTHESIS N statement M 
                             backpatch($3->trueList, $6);    //if TRUE, go to next_instr_addr i.e just before statement body
                             int* tempList = merge($3->falseList, $7->nextList); //merge falselist of expression, nextlist of statement and second augmented_goto
                             $$->nextList = merge($8->nextList, tempList); //merge nextlist of statement and augmented_goto
-                            printf("selection-statement\n");
+                            // printf("selection-statement\n");
                         }
                     | IF L_PARENTHESIS expression M R_PARENTHESIS N statement M ELSE N statement {
-                                // printf("\n\nRUNNN forrest RUNNN\n\n");
+                                // // printf("\n\nRUNNN forrest RUNNN\n\n");
                                 backpatch($4->nextList, nextInstr());
                                 $3 = int2bool($3);
                                 $$ = create_statement();
@@ -935,7 +935,7 @@ selection_statement : IF L_PARENTHESIS expression M R_PARENTHESIS N statement M 
                                 backpatch($3->falseList, $10);  //if FALSE, go to next_instr_addr i.e just before else body
                                 int* tempList = merge($7->nextList, $8->nextList); //merge falselist of expression, nextlist of statement and second augmented_goto
                                 $$->nextList = merge($11->nextList, tempList); //merge nextlist of statement and augmented_goto
-                                printf("selection-statement\n");
+                                // printf("selection-statement\n");
                             }
                     ;
 
@@ -959,7 +959,7 @@ iteration_statement : FOR L_PARENTHESIS expression_opt SEMICOLON N expression_op
                                 emit(OP_GOTO, NULL, NULL, intTOstr);
                                 $$->nextList = $6->falseList;   // exit when false
                             }
-                            printf("iteration-statement\n");
+                            // printf("iteration-statement\n");
                         }
                     ;
 
@@ -998,28 +998,28 @@ jump_statement : RETURN expression_opt SEMICOLON {
                             // emit the code for return
                             emit(OP_RETURN, NULL, NULL, $2->loc->name);
                         }
-                        printf("jump-statement\n");
+                        // printf("jump-statement\n");
                     }
                ;
 
 /* TRANSLATION UNIT */
 translation_unit : external_declaration 
                     {
-                        printf("translation-unit\n");
+                        // printf("translation-unit\n");
                     }
                  | translation_unit external_declaration 
                     {
-                        printf("translation-unit\n");
+                        // printf("translation-unit\n");
                     }
                  ;
 
 external_declaration : declaration 
                         {
-                            printf("external-declaration\n");
+                            // printf("external-declaration\n");
                         }
                      | function_definition 
                         {
-                            printf("external-declaration\n");
+                            // printf("external-declaration\n");
                         }
                      ;
 
@@ -1042,7 +1042,7 @@ function_definition : type_specifier declarator switch_table compound_statement 
                             emit(OP_ENDFUNC, NULL, NULL, currST->name);
                             // just to be safe, set the current symbol table to global symbol table
                             currST = globalST;
-                            printf("function-definition\n");
+                            // printf("function-definition\n");
                         }
                     ;
 
@@ -1052,7 +1052,7 @@ M : {
         $$ = create_statement();
         $$->nextList = makelist(nextInstr());
         emit(OP_GOTO, NULL, NULL, NULL);
-        printf("M\n");
+        // printf("M\n");
     }
   ;
 
@@ -1061,34 +1061,34 @@ func_ID : IDENTIFIER {
                 $$ = $1;
                 // store for function return type
                 update_type($$, create_symboltype(pop(&var_type), 1, NULL));
-                // printf("\n\nTYPE %d\n\n", $$->type->type);
-                // printf("func-ID\n");
+                // // printf("\n\nTYPE %d\n\n", $$->type->type);
+                // // printf("func-ID\n");
             }
         ;
 
 new_table : {   
                 char* entry = function_name;
-                // printf("\n\n\t\t ST \t\t %s\n\n", entry);
+                // // printf("\n\n\t\t ST \t\t %s\n\n", entry);
                 currST = create_symboltable(entry, globalST);
                 // update_type(lastEntry, create_symboltype(TYPE_FUNC, 1, NULL));
                 // lastEntry->category = TYPE_FUNC;
                 // lastEntry->next = currST;
-                printf("new-table\n");
+                // printf("new-table\n");
             }
           ;
 
 N : {
         // next instruction
         $$ = nextInstr();
-        // printf("\n\nNUMER %d\n\n", $$);
-        printf("next-instruction\n");
+        // // printf("\n\nNUMER %d\n\n", $$);
+        // printf("next-instruction\n");
     }
   ;
 
 switch_table : {
                     currST = new_ST;
                     emit(OP_FUNC, NULL, NULL, currST->name);
-                    //printf("\n\nswitch-table\n\n");
+                    //// printf("\n\nswitch-table\n\n");
                }
              ;
 
@@ -1096,6 +1096,6 @@ switch_table : {
 /* C Code for functions */
 
 void yyerror(char *s) {
-    printf("Error: %s on '%s' at line %d\n", s, yytext, yylineno);
+    // printf("Error: %s on '%s' at line %d\n", s, yytext, yylineno);
     exit(1);
 }

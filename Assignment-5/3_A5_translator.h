@@ -93,8 +93,8 @@ struct qArray{       // Linked list of quads
 };
 typedef struct qArray qArray;
 
-void print_quadArray(qArray* head); // Print the quads
-void print_quad(quad* q);              // Print a single quad
+void print_quadArray(FILE* file, qArray* head); // Print the quads
+void print_quad(FILE* file, quad* q);              // Print a single quad
 void emit(enum op_code op, char* arg1, char* arg2, char* result);  // Emit a quad -- add to quadArray
 char* printOP(enum op_code op); // Print the operator
 int nextInstr(); // Get the next instruction number
@@ -255,7 +255,7 @@ symboltableentry* genparam(symboltype* type, char* initial_value); // Generate a
 void set_offset(symboltable* currST); // Set the offset of a symbol
 void update_return_ST(symboltable* currST, int update); // Update the return type of a function
 void update_type(symboltableentry* entry, symboltype* type); // Update the type of a symbol
-void print_ST(symboltable *currST); // Print the symbol table
+void print_ST(FILE* file, symboltable *currST); // Print the symbol table
 void update_ST(symboltable* currST, symboltableentry* entry); // Update the symbol table
 char* printType(symboltype* type); // Print the type of a symbol
 char* printCategory(enum category_enum category); // Print the category of a symbol
@@ -266,7 +266,7 @@ void push_args(symboltable* currST, symboltableentry* arg); // Push arguments to
 /*                              ASM GENERATOR                             */
 /**************************************************************************/
 void gen_activation_record(symboltable* currST);
-void tac2x86();
-void print_activationRecord(symboltable* currST);
+void tac2x86(FILE* file);
+void print_activationRecord(FILE* file, symboltable* currST);
 
 #endif // __PARSER_H

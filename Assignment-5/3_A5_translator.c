@@ -9,6 +9,7 @@
 
 extern void yyerror(char *s); // This function is called when there is a parsing error
 extern int yyparse(void);
+extern FILE* yyin; 
 
 /**************************************************************************/
 /*                        GLOBAL VARIABLES                                */
@@ -324,7 +325,7 @@ void insert_ar(char* key, int value, HashAR* hashmap[]){
 int search_ar(char *key, HashAR *hashmap[]){
     if(key == NULL){
         // printf("Error search_ar: Key cannot be NULL.\n");
-        return -1;
+        return 0;
     }
     int hashIndex = hash_ar(key);
     HashAR* temp = hashmap[hashIndex];
@@ -334,7 +335,7 @@ int search_ar(char *key, HashAR *hashmap[]){
         }
         temp = temp->next;
     }
-    return -1;
+    return 0;
 }
 
 // HASH for Label (return label)
@@ -478,32 +479,32 @@ void gen_activation_record(symboltable* currST){
     return;
 }
 
-void print_activationRecord(symboltable* currST){
-    printf("\n\n==================================================================================================================\n");
-    printf("ACTIVATION RECORD: %s\n", currST->name);
-    printf("------------------------------------------------------------------------------------------------------------------\n");
+void print_activationRecord(FILE* file, symboltable* currST){
+    fprintf(file, "\n\n==================================================================================================================\n");
+    fprintf(file, "ACTIVATION RECORD: %s\n", currST->name);
+    fprintf(file, "------------------------------------------------------------------------------------------------------------------\n");
     // name, category, offset, 
-    printf("%-15s%-15s%-15s%-15s\n", "Name", "Category", "Offset", "Nested Table");
-    printf("------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(file, "%-15s%-15s%-15s%-15s\n", "Name", "Category", "Offset", "Nested Table");
+    fprintf(file, "------------------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i< MAX_HASH_AR; i++){
         HashAR* temp = currST->_aRecord[i];
         // get symboltableentry of sa,e name from symbol table
         while(temp != NULL){
             symboltableentry* entry = lookup(currST, temp->key);
-            printf("%-15s", temp->key);
-            printf("%-15s", printCategory(entry->category));
-            printf("%-15d", temp->value);
-            printf("-\n");
+            fprintf(file, "%-15s", temp->key);
+            fprintf(file, "%-15s", printCategory(entry->category));
+            fprintf(file, "%-15d", temp->value);
+            fprintf(file, "-\n");
             temp = temp->next;
         }
     }
-    printf("==================================================================================================================\n");
+    fprintf(file, "==================================================================================================================\n");
     // print the nested symbol tables
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
         if(entry->next != NULL && entry->category == TYPE_FUNCTION){
-            print_activationRecord(entry->next);
-            printf("\n");
+            print_activationRecord(file, entry->next);
+            fprintf(file, "\n");
         }
     }
 }
@@ -524,11 +525,11 @@ void iterate_hashmap(HashLabel* hashmap[], int size) {
 }
 */
 
-void tac2x86(){
+void tac2x86(FILE* file){
     // first loop
     qArray* currentQArray = quadArray;
     while(currentQArray !=NULL && currentQArray->arr != NULL && currentQArray->count != 0){
-    // printf("\n\nHELLO\n\n");
+    // fprintf(file, "\n\nHELLO\n\n");
         quad* currQ = currentQArray->arr;
         if (currQ->op == OP_GOTO || currQ->op == OP_LT || currQ->op == OP_GT || currQ->op == OP_LT_EQUALS || currQ->op == OP_GT_EQUALS || currQ->op == OP_EQUALS || currQ->op == OP_NOT_EQUALS) {
             if (currQ->result == NULL) {
@@ -565,17 +566,17 @@ void tac2x86(){
             // CHAR
             if(entry->type->type == TYPE_CHAR){
                 if(entry->initial_value == NULL){
-                    // printf("Global Char: %s\n", entry->name);
-                    printf("\t.comm\t%s,1,1\n", entry->name);
+                    // fprintf(file, "Global Char: %s\n", entry->name);
+                    fprintf(file, "\t.comm\t%s,1,1\n", entry->name);
                 }
                 else{
-                    // printf("Global Char: %s = %s\n", entry->name, entry->initial_value);
-                    printf("\t.globl\t%s\n", entry->name);
-                    // printf("\t.data\n");
-                    printf("\t.type\t%s, @object\n", entry->name);
-                    printf("\t.size\t%s, 1\n", entry->name);
-                    printf("%s:\n", entry->name);
-                    printf("\t.byte\t%d\n", atoi(entry->initial_value));
+                    // fprintf(file, "Global Char: %s = %s\n", entry->name, entry->initial_value);
+                    fprintf(file, "\t.globl\t%s\n", entry->name);
+                    // fprintf(file, "\t.data\n");
+                    fprintf(file, "\t.type\t%s, @object\n", entry->name);
+                    fprintf(file, "\t.size\t%s, 1\n", entry->name);
+                    fprintf(file, "%s:\n", entry->name);
+                    fprintf(file, "\t.byte\t%d\n", atoi(entry->initial_value));
                 }
                 // insert into global hashmap
                 insert_global(entry->name, true, _globalVars);
@@ -583,26 +584,26 @@ void tac2x86(){
             // INT
             if(entry->type->type == TYPE_INT){
                 if(entry->initial_value == NULL){
-                    // printf("Global Int: %s\n", entry->name);
-                    printf("\t.comm\t%s,4,4\n", entry->name);
+                    // fprintf(file, "Global Int: %s\n", entry->name);
+                    fprintf(file, "\t.comm\t%s,4,4\n", entry->name);
                 }
                 else{
-                    // printf("Global Int: %s = %s\n", entry->name, entry->initial_value);
-                    printf("\t.globl\t%s\n", entry->name);
-                    printf("\t.data\n");
-                    printf("\t.align 4\n");
-                    printf("\t.type\t%s, @object\n", entry->name);
-                    printf("\t.size\t%s, 4\n", entry->name);
-                    printf("%s:\n", entry->name);
+                    // fprintf(file, "Global Int: %s = %s\n", entry->name, entry->initial_value);
+                    fprintf(file, "\t.globl\t%s\n", entry->name);
+                    fprintf(file, "\t.data\n");
+                    fprintf(file, "\t.align 4\n");
+                    fprintf(file, "\t.type\t%s, @object\n", entry->name);
+                    fprintf(file, "\t.size\t%s, 4\n", entry->name);
+                    fprintf(file, "%s:\n", entry->name);
                     // long -> int
-                    printf("\t.long\t%d\n", atoi(entry->initial_value));
+                    fprintf(file, "\t.long\t%d\n", atoi(entry->initial_value));
                 }
                 // insert into global hashmap
                 insert_global(entry->name, true, _globalVars);
             }
             // ARRAY
             if(entry->type->type == TYPE_ARRAY){
-                printf("\t.comm\t%s,%d,4\n", entry->name, entry->size);
+                fprintf(file, "\t.comm\t%s,%d,4\n", entry->name, entry->size);
                 // insert into global hashmap
                 insert_global(entry->name, true, _globalVars);
             }
@@ -613,19 +614,19 @@ void tac2x86(){
     string_list* currString = string_head;
     // get size
     int string_head_size = ll_length(string_head);
-    // printf("\n\nLENGTH: %d\n\n", string_head_size);
+    // fprintf(file, "\n\nLENGTH: %d\n\n", string_head_size);
     if(string_head_size>0){
-        printf("\t.section\t.rodata\n");
+        fprintf(file, "\t.section\t.rodata\n");
         currString = string_head;
         while(currString != NULL){
-            printf(".LC%d:\n", currString->entries);
-            printf("\t.string\t%s\n", currString->str);
+            fprintf(file, ".LC%d:\n", currString->entries);
+            fprintf(file, "\t.string\t%s\n", currString->str);
             currString = currString->next;
         }
     }
 
     // TEXT SECTION
-    printf("\t.text \n");
+    fprintf(file, "\t.text \n");
     // initialize params list
     param_list* params_head = param_list_initialize();
     currST = globalST;
@@ -637,7 +638,7 @@ void tac2x86(){
         int iterator = currentQArray->count; // -1 ?
         if(label_count(iterator, _lablesRecord)){
             int count = label_at(iterator, _lablesRecord)->value;
-            printf(".L%d:\n", 2 * _LabelCount + count + 2);
+            fprintf(file, ".L%d:\n", 2 * _LabelCount + count + 2);
         }
         
         char* op = printOP(currentQArray->arr->op);
@@ -650,7 +651,7 @@ void tac2x86(){
         char* result_ar;
         if(search_global(result, _globalVars)){
             // concatenate "(%rip)" to result
-            result_ar = (char*)malloc(sizeof(char)*(strlen(result)+7));
+            result_ar = (char*)malloc(sizeof(char)*(strlen(result)+15));
             sprintf(result_ar, "%s(%%rip)", result);
         }
         else{
@@ -664,7 +665,7 @@ void tac2x86(){
         char* arg1_ar;
         if(search_global(arg1, _globalVars)){
             // concatenate "(%rip)" to arg1
-            arg1_ar = (char*)malloc(sizeof(char)*(strlen(arg1)+7));
+            arg1_ar = (char*)malloc(sizeof(char)*(strlen(arg1)+15));
             sprintf(arg1_ar, "%s(%%rip)", arg1);
         }
         else{
@@ -678,7 +679,7 @@ void tac2x86(){
         char* arg2_ar;
         if(search_global(arg2, _globalVars)){
             // concatenate "(%rip)" to arg2
-            arg2_ar = (char*)malloc(sizeof(char)*(strlen(arg2)+7));
+            arg2_ar = (char*)malloc(sizeof(char)*(strlen(arg2)+15));
             sprintf(arg2_ar, "%s(%%rip)", arg2);
         }
         else{
@@ -693,7 +694,7 @@ void tac2x86(){
             param_list_insert(params_head, result);
         }
         else{
-            printf("\t");
+            fprintf(file, "\t");
             // Binary Operations
             // Addition
             if (op == "+") {
@@ -710,26 +711,26 @@ void tac2x86(){
                         flag = false;
                 }
                 if(flag){
-                    printf("addl \t$%d, %s\n", atoi(arg2), arg1_ar);
+                    fprintf(file, "addl \t$%d, %s\n", atoi(arg2), arg1_ar);
                 }
                 else{
                     // AMBIGIOUS
-                    printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                    printf("\tmovl\t%s, %%edx\n", arg2_ar);
-                    printf("\taddl \t%%edx, %%eax\n");
-                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                    fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                    fprintf(file, "\tmovl\t%s, %%edx\n", arg2_ar);
+                    fprintf(file, "\taddl \t%%edx, %%eax\n");
+                    fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             // Subtraction
             else if (op == "-"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tmovl\t%s, %%edx\n", arg2_ar);
-                printf("\tsubl \t%%edx, %%eax\n");
-                printf("\tmovl\t%%eax, %s\n", result_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tmovl\t%s, %%edx\n", arg2_ar);
+                fprintf(file, "\tsubl \t%%edx, %%eax\n");
+                fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
             }
             // multiplication
             else if(op == "*"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
                 bool flag = true;
                 if(s==NULL || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))){
                     flag = false;
@@ -743,8 +744,8 @@ void tac2x86(){
                         flag = false;
                 }
                 if(flag){
-                    printf("# %s = %s * %s\n", result, arg1, arg2);
-                    printf("\timull \t$%d, %%eax\n", atoi(arg2));
+                    fprintf(file, "# %s = %s * %s\n", result, arg1, arg2);
+                    fprintf(file, "\timull \t$%d, %%eax\n", atoi(arg2));
                     symboltable* tempTab = currST;
                     char* val;
                     // check if arg1 is a global variable
@@ -755,29 +756,29 @@ void tac2x86(){
                     }
                 }
                 else{
-                    printf("\timull \t%s, %%eax\n", arg2_ar);
-                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                    fprintf(file, "\timull \t%s, %%eax\n", arg2_ar);
+                    fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             // division 
             else if(op=="/"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcltd\n");
-                printf("\tidivl \t%s\n", arg2_ar);
-                printf("\tmovl\t%%eax, %s\n", result_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcltd\n");
+                fprintf(file, "\tidivl \t%s\n", arg2_ar);
+                fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
             }
             // modulo
             else if(op == "%"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcltd\n");
-                printf("\tidivl \t%s\n", arg2_ar);
-                printf("\tmovl\t%%edx, %s\n", result_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcltd\n");
+                fprintf(file, "\tidivl \t%s\n", arg2_ar);
+                fprintf(file, "\tmovl\t%%edx, %s\n", result_ar);
             }
             // assign
             else if(op =="="){
                 if(make_quad == true){
-                    printf("\tmovq \t%s, %%rax\n", arg1_ar);
-                    printf("\tmovq \t%%rax, %s\n", result_ar);
+                    fprintf(file, "\tmovq \t%s, %%rax\n", arg1_ar);
+                    fprintf(file, "\tmovq \t%%rax, %s\n", result_ar);
                     make_quad = false;
                 }
                 else{
@@ -795,126 +796,126 @@ void tac2x86(){
                             flag = false;
                     }
                     if(flag){
-                        printf("movl\t$%d, %%eax\n", atoi(arg1));
+                        fprintf(file, "movl\t$%d, %%eax\n", atoi(arg1));
                     }
                     else{
-                        printf("\tmovl\t%s, %%eax\n", arg1_ar);
+                        fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
                     }
-                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                    fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             else if(op=="=str"){
-                printf("movq \t$.LC%s, %s\n", arg1, result_ar);
+                fprintf(file, "movq \t$.LC%s, %s\n", arg1, result_ar);
             }
             // Relational
             else if(op=="=="){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tje .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tje .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="!="){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tjne .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tjne .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="<"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tjl .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tjl .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op==">"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tjg .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tjg .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="<="){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tjle .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tjle .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op==">="){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tcmpl\t%s, %%eax\n", arg2_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tcmpl\t%s, %%eax\n", arg2_ar);
                 int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                printf("\tjge .L%d\n", 2 * _LabelCount + tempCount + 2);
+                fprintf(file, "\tjge .L%d\n", 2 * _LabelCount + tempCount + 2);
             }
             else if(op=="goto"){
                 if (result != NULL) {
                     int tempCount = label_at(atoi(result), _lablesRecord)->value;
-                    printf("jmp .L%d\n", 2 * _LabelCount + tempCount + 2);
+                    fprintf(file, "jmp .L%d\n", 2 * _LabelCount + tempCount + 2);
                 }
             }
 
             // Unary Operations
             else if(op == "=&"){
-                printf("# %s = &%s\n", result, arg1);
-                printf("\tleaq\t%s, %%rax\n", arg1_ar);
-                printf("\tmovq \t%%rax, %s\n", result_ar);
+                fprintf(file, "# %s = &%s\n", result, arg1);
+                fprintf(file, "\tleaq\t%s, %%rax\n", arg1_ar);
+                fprintf(file, "\tmovq \t%%rax, %s\n", result_ar);
                 make_quad = true;
             }
             else if(op=="=*"){
-                printf("# %s = *%s\n", result, arg1);
-                printf("\tmovq\t%s, %%rax\n", arg1_ar);
-                printf("\tmovl\t(%%rax), %%eax\n");
-                printf("\tmovl\t%%eax, %s\n", result_ar);
+                fprintf(file, "# %s = *%s\n", result, arg1);
+                fprintf(file, "\tmovq\t%s, %%rax\n", arg1_ar);
+                fprintf(file, "\tmovl\t(%%rax), %%eax\n");
+                fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
             }
             else if(op=="*="){
-                printf("# *%s = %s\n", result, arg1);
-                printf("\tmovl\t%s, %%eax\n", result_ar);
-                printf("\tmovl\t%s, %%edx\n", arg1_ar);
+                fprintf(file, "# *%s = %s\n", result, arg1);
+                fprintf(file, "\tmovl\t%s, %%eax\n", result_ar);
+                fprintf(file, "\tmovl\t%s, %%edx\n", arg1_ar);
                 // cout << "\tmovl\t%edx, (%eax)";
-                printf("\tmovl\t%%edx, (%%eax)\n");
+                fprintf(file, "\tmovl\t%%edx, (%%eax)\n");
             }
             else if(op=="uminus"){
-                printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                printf("\tnegl\t%%eax\n");
-                printf("\tmovl\t%%eax, %s\n", result_ar);
+                fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                fprintf(file, "\tnegl\t%%eax\n");
+                fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
             }
             else if(op == "=[]"){
-                printf("# =[] operation ; ");
-                printf("%s = %s[%s]\n", result, arg1, arg2);
+                fprintf(file, "# =[] operation ; ");
+                fprintf(file, "%s = %s[%s]\n", result, arg1, arg2);
                 if(search_global(arg1, _globalVars)){
-                    printf("\tmovl\t%s, %%eax\n", arg2_ar);
-                    printf("\tmovslq\t%%eax, %%rdx\n");
-                    printf("\tleaq\t0(,%%rdx,4), %%rdx\n");
-                    printf("\tleaq\t%s, %%rax\n", arg1_ar);
-                    printf("\tmovl\t(%%rdx,%%rax), %%eax\n");
-                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                    fprintf(file, "\tmovl\t%s, %%eax\n", arg2_ar);
+                    fprintf(file, "\tmovslq\t%%eax, %%rdx\n");
+                    fprintf(file, "\tleaq\t0(,%%rdx,4), %%rdx\n");
+                    fprintf(file, "\tleaq\t%s, %%rax\n", arg1_ar);
+                    fprintf(file, "\tmovl\t(%%rdx,%%rax), %%eax\n");
+                    fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
                 }
                 else{
-                    printf("\tmovl\t%s, %%ecx\n", arg2_ar);
-                    printf("\tmovl\t%d(%%rbp,%%rcx,4), %%eax\n", search_ar(arg1, currST->_aRecord));
-                    printf("\tmovl\t%%eax, %s\n", result_ar);
+                    fprintf(file, "\tmovl\t%s, %%ecx\n", arg2_ar);
+                    fprintf(file, "\tmovl\t%d(%%rbp,%%rcx,4), %%eax\n", search_ar(arg1, currST->_aRecord));
+                    fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
                 }
             }
             else if(op=="[]="){
-                printf("# []= operation ; ");
-                printf("%s[%s] = %s\n", result, arg1, arg2);
+                fprintf(file, "# []= operation ; ");
+                fprintf(file, "%s[%s] = %s\n", result, arg1, arg2);
                 if(search_global(result, _globalVars)){
-                    printf("\tmovl\t%s, %%eax\n", arg2_ar);
-                    printf("\tmovl\t%s, %%edx\n", arg1_ar);
-                    printf("\tmovslq\t%%edx, %%rdx\n");
-                    printf("\tleaq\t0(,%%rdx,4), %%rcx\n");
-                    printf("\tleaq\t%s, %%rdx\n", result_ar);
-                    printf("\tmovl\t%%eax, (%%rcx,%%rdx)\n");
+                    fprintf(file, "\tmovl\t%s, %%eax\n", arg2_ar);
+                    fprintf(file, "\tmovl\t%s, %%edx\n", arg1_ar);
+                    fprintf(file, "\tmovslq\t%%edx, %%rdx\n");
+                    fprintf(file, "\tleaq\t0(,%%rdx,4), %%rcx\n");
+                    fprintf(file, "\tleaq\t%s, %%rdx\n", result_ar);
+                    fprintf(file, "\tmovl\t%%eax, (%%rcx,%%rdx)\n");
                 }
                 else{
-                    printf("\tmovl\t%s, %%eax\n", arg1_ar);
-                    printf("\tmovl\t%s, %%edx\n", arg2_ar);
-                    printf("\tmovl\t%%edx, %d(%%rbp,%%rax,4)\n", search_ar(result, currST->_aRecord));
+                    fprintf(file, "\tmovl\t%s, %%eax\n", arg1_ar);
+                    fprintf(file, "\tmovl\t%s, %%edx\n", arg2_ar);
+                    fprintf(file, "\tmovl\t%%edx, %d(%%rbp,%%rax,4)\n", search_ar(result, currST->_aRecord));
                 }
             }
             else if(op=="return"){
                 if(result != NULL){
-                    printf("\tmovl\t%s, %%eax\n", result_ar);
+                    fprintf(file, "\tmovl\t%s, %%eax\n", result_ar);
                 }
                 // jump to the end of the function -- epilogue
-                printf("\tjmp .LFE%d\n", _LabelCount);
+                fprintf(file, "\tjmp .LFE%d\n", _LabelCount);
             }
             else if(op=="param"){
                 // push arg1 to params_head
@@ -937,98 +938,98 @@ void tac2x86(){
                     if(i==0){
                         // first parameter 
                         int val = search_ar(tempPara->param, currST->_aRecord);
-                        printf("movl\t%d(%%rbp), %%eax\n", val);
-                        printf("\tmovq\t%d(%%rbp), %%rdi\n", val);
+                        fprintf(file, "movl\t%d(%%rbp), %%eax\n", val);
+                        fprintf(file, "\tmovq\t%d(%%rbp), %%rdi\n", val);
                     }
                     else if(i==1){
                         int val = search_ar(tempPara->param, currST->_aRecord);
-                        printf("movl\t%d(%%rbp), %%eax\n", val);
-                        printf("\tmovq\t%d(%%rbp), %%rsi\n", val);
+                        fprintf(file, "movl\t%d(%%rbp), %%eax\n", val);
+                        fprintf(file, "\tmovq\t%d(%%rbp), %%rsi\n", val);
                     }
                     else if(i==2){
                         int val = search_ar(tempPara->param, currST->_aRecord);
-                        printf("movl\t%d(%%rbp), %%eax\n", val);
-                        printf("\tmovq\t%d(%%rbp), %%rdx\n", val);
+                        fprintf(file, "movl\t%d(%%rbp), %%eax\n", val);
+                        fprintf(file, "\tmovq\t%d(%%rbp), %%rdx\n", val);
                     }
                     else if(i==3){
                         int val = search_ar(tempPara->param, currST->_aRecord);
-                        printf("movl\t%d(%%rbp), %%eax\n", val);
-                        printf("\tmovq\t%d(%%rbp), %%rcx\n", val);
+                        fprintf(file, "movl\t%d(%%rbp), %%eax\n", val);
+                        fprintf(file, "\tmovq\t%d(%%rbp), %%rcx\n", val);
                     }
                     else{
                         int val = search_ar(tempPara->param, currST->_aRecord);
-                        printf("\tmovq\t%d(%%rbp), %%rdi\n", val);
+                        fprintf(file, "\tmovq\t%d(%%rbp), %%rdi\n", val);
                     }
                     tempPara = tempPara->next;
                 }
                 // clear para stack
                 params_head = param_list_delete(params_head);
-                printf("\tcall\t%s\n", arg1);
-                printf("\tmovl\t%%eax, %s\n", result_ar);
+                fprintf(file, "\tcall\t%s\n", arg1);
+                fprintf(file, "\tmovl\t%%eax, %s\n", result_ar);
             }
 
             else if(op == "function"){
                 // function begins -- prologue
-                printf(".globl\t%s\n", result);
-                printf("\t.type\t%s, @function\n", result);
-                printf("%s: \n", result);
-                printf(".LFB%d: \n", _LabelCount);
-                printf("\t.cfi_startproc\n");
-                printf("\tpushq\t%%rbp\n");
-                printf("\t.cfi_def_cfa_offset 8\n");
-                printf("\t.cfi_offset 5, -8\n");
-                printf("\tmovq\t%%rsp, %%rbp\n");
-                printf("\t.cfi_def_cfa_register 5\n");
+                fprintf(file, ".globl\t%s\n", result);
+                fprintf(file, "\t.type\t%s, @function\n", result);
+                fprintf(file, "%s: \n", result);
+                fprintf(file, ".LFB%d: \n", _LabelCount);
+                fprintf(file, "\t.cfi_startproc\n");
+                fprintf(file, "\tpushq\t%%rbp\n");
+                fprintf(file, "\t.cfi_def_cfa_offset 8\n");
+                fprintf(file, "\t.cfi_offset 5, -8\n");
+                fprintf(file, "\tmovq\t%%rsp, %%rbp\n");
+                fprintf(file, "\t.cfi_def_cfa_register 5\n");
                 currST = lookup(globalST, result)->next;
                 // get last entry of the symbol table -- count starts from 0
                 symboltableentry* lastEntry = currST->table_entries[currST->count-1];
-                // printf("\n\nST ENTRY: %s\n\n", currST->name);
-                // printf("\n\nST ENTRYsss: %d\n\n", currST->count);
-                // printf("\n\nLAST ENTRY: %s\n\n", lastEntry->name);
-                // printf("\n\nLAST ENTRY SIZE: %d\n\n", lastEntry->size);
-                // printf("\n\nLAST ENTRY OFFSET: %d\n\n", lastEntry->offset);
+                // fprintf(file, "\n\nST ENTRY: %s\n\n", currST->name);
+                // fprintf(file, "\n\nST ENTRYsss: %d\n\n", currST->count);
+                // fprintf(file, "\n\nLAST ENTRY: %s\n\n", lastEntry->name);
+                // fprintf(file, "\n\nLAST ENTRY SIZE: %d\n\n", lastEntry->size);
+                // fprintf(file, "\n\nLAST ENTRY OFFSET: %d\n\n", lastEntry->offset);
                 // get the size of the symbol table
                 int sizeTemp = lastEntry->offset;
                 // rsp register holds the address of the top of the stack
-                printf("\tsubq\t$%d, %%rsp\n", sizeTemp+24);  // MAX BUFFER: 4 Para + retVal + RA = 24 = (4+1+1)*4
+                fprintf(file, "\tsubq\t$%d, %%rsp\n", sizeTemp+24);  // MAX BUFFER: 4 Para + retVal + RA = 24 = (4+1+1)*4
 
                 // function table -- paramaters section
                 for(int i=0; i < currST->paramCount; i++){
                     symboltableentry* entry = currST->_argList[i];
                     if(i==0){
-                        printf("\tmovq\t%%rdi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                        fprintf(file, "\tmovq\t%%rdi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                    }
+                    else if(i==1){
+                        fprintf(file, "\tmovq\t%%rsi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
                     }
                     else if(i==2){
-                        printf("\tmovq\t%%rsi, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                        fprintf(file, "\tmovq\t%%rdx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
                     }
                     else if(i==3){
-                        printf("\tmovq\t%%rdx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
-                    }
-                    else if(i==4){
-                        printf("\tmovq\t%%rcx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
+                        fprintf(file, "\tmovq\t%%rcx, %d(%%rbp)\n", search_ar(entry->name, currST->_aRecord));
                     }
                 }
             }
             // function end -- epilogue
             else if(op=="end"){
-                printf(".LFE%d: \n", _LabelCount++);
-                printf("leave\n");
-                printf("\t.cfi_restore 5\n");
-                printf("\t.cfi_def_cfa 4, 4\n");
-                printf("\tret\n");
-                printf("\t.cfi_endproc\n");
-                printf("\t.size\t%s, .-%s\n", result, result);
+                fprintf(file, ".LFE%d: \n", _LabelCount++);
+                fprintf(file, "leave\n");
+                fprintf(file, "\t.cfi_restore 5\n");
+                fprintf(file, "\t.cfi_def_cfa 4, 4\n");
+                fprintf(file, "\tret\n");
+                fprintf(file, "\t.cfi_endproc\n");
+                fprintf(file, "\t.size\t%s, .-%s\n", result, result);
             }
             else{
-                printf("op: %s\n", op);
+                fprintf(file, "op: %s\n", op);
             }
-            // printf("\n");
+            // fprintf(file, "\n");
         }
         currentQArray = currentQArray->nextQuad;
     }
     // footer
-    printf("\t.ident\t\"group-03-julius-stabs-back\"\n");
-    printf("\t.section\t.note.GNU-stack,\"\",@progbits\n");
+    fprintf(file, "\t.ident\t\"group-03-julius-stabs-back\"\n");
+    fprintf(file, "\t.section\t.note.GNU-stack,\"\",@progbits\n");
 }
 
 
@@ -1274,36 +1275,36 @@ void update_ST(symboltable* currST, symboltableentry* entry){
     return;
 }
 
-void print_ST(symboltable *currST){
-    printf("\n\n==================================================================================================================\n");
-    (currST->parent) ? printf("Symbol Table: %-50s Parent: ST.%s\n", currST->name, currST->parent->name) : printf("Symbol Table: %-35s Parent: NULL\n", currST->name);
-    printf("------------------------------------------------------------------------------------------------------------------\n");
-    printf("%-15s%-15s%-20s%-20s%-15s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Offset", "Nested Table");
-    printf("------------------------------------------------------------------------------------------------------------------\n");
+void print_ST(FILE* file, symboltable *currST){
+    fprintf(file, "\n\n==================================================================================================================\n");
+    (currST->parent) ? fprintf(file, "Symbol Table: %-50s Parent: ST.%s\n", currST->name, currST->parent->name) : fprintf(file, "Symbol Table: %-35s Parent: NULL\n", currST->name);
+    fprintf(file, "------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(file, "%-15s%-15s%-20s%-20s%-15s%-15s%-20s\n", "Name", "Type", "Category", "Initial Value", "Size", "Offset", "Nested Table");
+    fprintf(file, "------------------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
-        printf("%-15s", entry->name);
-        printf("%-15s", printType(entry->type));
-        printf("%-20s", printCategory(entry->category));
-        (entry->initial_value) ? printf("%-20s", entry->initial_value) : printf("%-20s", "-");
-        printf("%-15d", entry->size);
-        printf("%-15d", entry->offset); // offset is not updated
+        fprintf(file, "%-15s", entry->name);
+        fprintf(file, "%-15s", printType(entry->type));
+        fprintf(file, "%-20s", printCategory(entry->category));
+        (entry->initial_value) ? fprintf(file, "%-20s", entry->initial_value) : fprintf(file, "%-20s", "-");
+        fprintf(file, "%-15d", entry->size);
+        fprintf(file, "%-15d", entry->offset); // offset is not updated
         if(entry->next != NULL){
-            printf("%-20s\n", entry->next->name);
+            fprintf(file, "%-20s\n", entry->next->name);
         }
         else{
-            printf("-\n");
+            fprintf(file, "-\n");
         }
     }
-    // printf("\n");
-    printf("==================================================================================================================\n");
+    // fprintf(file, "\n");
+    fprintf(file, "==================================================================================================================\n");
 
     // print the nested symbol tables
     for(int i=0; i< currST->count; i++){
         symboltableentry* entry = (currST->table_entries[i]);
         if(entry->next != NULL && entry->category == TYPE_FUNCTION){
-            print_ST(entry->next);
-            printf("\n");
+            print_ST(file, entry->next);
+            fprintf(file, "\n");
         }
     }
 }
@@ -1389,14 +1390,14 @@ char* printOP(enum op_code op){
 }
 
 // print the quad
-void print_quad(quad* arr){
+void print_quad(FILE* file, quad* arr){
     switch(arr->op){
         case OP_PLUS:
         case OP_MINUS:
         case OP_MULT:
         case OP_DIV:
         case OP_MOD:
-            printf("%s = %s %s %s\n", arr->result, arr->arg1, printOP(arr->op), arr->arg2);
+            fprintf(file, "%s = %s %s %s\n", arr->result, arr->arg1, printOP(arr->op), arr->arg2);
             break;
         case OP_EQUALS:
         case OP_NOT_EQUALS:
@@ -1404,82 +1405,82 @@ void print_quad(quad* arr){
         case OP_LT_EQUALS:
         case OP_GT:
         case OP_GT_EQUALS:
-            printf("if %s %s %s goto %s\n", arr->arg1, printOP(arr->op), arr->arg2, arr->result);
+            fprintf(file, "if %s %s %s goto %s\n", arr->arg1, printOP(arr->op), arr->arg2, arr->result);
             break;
         case OP_GOTO:
-            printf("goto %s\n", arr->result);
+            fprintf(file, "goto %s\n", arr->result);
             break;
         case OP_ASSIGN:
-            printf("%s = %s\n", arr->result , arr->arg1);
+            fprintf(file, "%s = %s\n", arr->result , arr->arg1);
             break;
         case OP_ASSIGN_STR:
-            printf("%s = string(%s)\n", arr->result, arr->arg1);
+            fprintf(file, "%s = string(%s)\n", arr->result, arr->arg1);
             break;
         case OP_ASSIGN_AMPER:
-            printf("%s = &%s\n", arr->result, arr->arg1);
+            fprintf(file, "%s = &%s\n", arr->result, arr->arg1);
             break;
         case OP_ASSIGN_ASTERISK:
-            printf("%s = *%s\n", arr->result, arr->arg1);
+            fprintf(file, "%s = *%s\n", arr->result, arr->arg1);
             break;
         case OP_ASTERISK_ASSIGN:
-            printf("*%s = %s\n", arr->result, arr->arg1);
+            fprintf(file, "*%s = %s\n", arr->result, arr->arg1);
             break;
         case OP_UMINUS:
-            printf("%s = -%s\n", arr->result, arr->arg1);
+            fprintf(file, "%s = -%s\n", arr->result, arr->arg1);
             break;
         case OP_ASSIGN_BOX:
-            printf("%s = %s[%s]\n", arr->result, arr->arg1, arr->arg2);
+            fprintf(file, "%s = %s[%s]\n", arr->result, arr->arg1, arr->arg2);
             break;
         case OP_BOX_ASSIGN:
-            printf("%s[%s] = %s\n", arr->result, arr->arg1, arr->arg2);
+            fprintf(file, "%s[%s] = %s\n", arr->result, arr->arg1, arr->arg2);
             break;
         case OP_RETURN:
-            printf("return %s\n", arr->result);
+            fprintf(file, "return %s\n", arr->result);
             break;
         case OP_RETURN_VOID:
-            printf("return\n");
+            fprintf(file, "return\n");
             break;
         case OP_PARAM:
-            printf("param %s\n", arr->result);
+            fprintf(file, "param %s\n", arr->result);
             break;
         case OP_CALL:
-            printf("%s = call %s, %s\n", arr->result, arr->arg1, arr->arg2);
+            fprintf(file, "%s = call %s, %s\n", arr->result, arr->arg1, arr->arg2);
             break;
         case OP_CALL_VOID:
-            printf("call %s, %s\n", arr->arg1, arr->arg2);
+            fprintf(file, "call %s, %s\n", arr->arg1, arr->arg2);
             break;
         case OP_FUNC:
-            printf("function %s:\n", arr->result);
+            fprintf(file, "function %s:\n", arr->result);
             break;
         case OP_LABEL:
-            printf("%s:\n", arr->result);
+            fprintf(file, "%s:\n", arr->result);
             break;
         case OP_ENDFUNC:
-            printf("end %s\n", arr->result);
+            fprintf(file, "end %s\n", arr->result);
             break;
         default:
-            printf("NULL\n");
+            fprintf(file, "NULL\n");
     }
 }
 
 // print the quad array -- this function prints the Three Address Code
-void print_quadArray(qArray* head){
+void print_quadArray(FILE* file, qArray* head){
     qArray* curr = head;
-    printf("=============================================================================================================\n");
-    printf("THREE ADDRESS CODE\n");
-    printf("-------------------------------------------------------------------------------------------------------------\n");
+    fprintf(file, "=============================================================================================================\n");
+    fprintf(file, "THREE ADDRESS CODE\n");
+    fprintf(file, "-------------------------------------------------------------------------------------------------------------\n");
     // if empty
     if(curr->arr == NULL){
-        printf("NULL\n");
-        printf("\n=============================================================================================================\n\n");
+        fprintf(file, "NULL\n");
+        fprintf(file, "\n=============================================================================================================\n\n");
         return;
     }
     while(curr != NULL && curr->count != 0){
-        printf("%d: ", curr->count);
-        print_quad(curr->arr);
+        fprintf(file, "%d: ", curr->count);
+        print_quad(file, curr->arr);
         curr = curr->nextQuad;
     }
-    printf("\n=============================================================================================================\n\n");
+    fprintf(file, "\n=============================================================================================================\n\n");
 }
 
 // initilize quadArray
@@ -1528,7 +1529,24 @@ int nextInstr(){
     return curr->count+1;
 }
 
-int main(){
+int main(int argc, char** argv){
+    printf("\n\n");
+    // check if the input < 3 or if first para is non digit
+    if (argc < 3 ) {
+        printf("Usage: %s <1=out/2=asm> <nanoC file>\n", argv[0]);
+        return 1;
+    }
+    const char* inname = argv[2];
+    // remove the extension
+    printf("Starting Compiler\n");
+    int dot_at = strlen(inname)-3;
+    char* outname = (char*)malloc(sizeof(char)*dot_at+1);
+    for(int i=0; i!=dot_at; i++){
+        outname[i] = inname[i];
+    }
+    outname[dot_at] = '\0';
+    printf("Input File: %s\n", inname);
+    
     for(int i = 0; i < MAX_HASH_LABEL; i++){
         _lablesRecord[i] = NULL;
         _globalVars[i] = NULL;
@@ -1536,24 +1554,82 @@ int main(){
     printf("Initializing Symbol Tables\n");
     globalST = create_symboltable("Global", NULL);
     currST = globalST;
+    printf("Initializing Variable STack\n");
     stack_intialize(&var_type);
+    printf("Initializing String Linked List\n");
     string_head = string_list_initialize();
+    printf("Initializing Quad Array\n");
     quadArray = quadArray_initialize(quadArray);
-    // gentemp test
-    // symboltableentry* temp = gentemp(create_symboltype(TYPE_INT, 1, NULL), "69");
-    // gentemp update test
+
     printf("Starting Parser\n");
+    // send input to parser
+    FILE* file = fopen(inname, "r");
+    if (!file) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    yyin = file;
     yyparse();
+    printf("Parser Done, Updating Symbol Tables Offset\n");
     set_offset(globalST);
+    printf("Generating Activation Records\n");
     gen_activation_record(globalST);
-    printf("\n\n\nActivation Record:\n");
-    print_activationRecord(globalST);
-    printf("Global Symbol Table:\n");
-    print_ST(globalST);
-    printf("\n\n\n");
-    print_quadArray(quadArray);
-    printf("\n\n\n");
-    // printf("x86:\n");
-    tac2x86();
+
+    if(strcmp(argv[1], "1") == 0){
+        printf("Writing TACs\n");
+        // open file for writing outname.tac
+        char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
+        sprintf(outname_out, "%s.tac", outname);
+        FILE* file_out = fopen(outname_out, "w");
+        if (!file_out) {
+            perror("Error opening file");
+            return 1;
+        }
+        printf("\tWriting TACs -- Activation Record\n");
+        print_activationRecord(file_out, globalST);
+        printf("\tWriting TACs -- Symbol Table\n");
+        print_ST(file_out, globalST);
+        printf("\tWriting TACs -- TAC\n");
+        print_quadArray(file_out, quadArray);
+        printf("\n\n\n");
+        // close file
+        fclose(file_out);
+    }
+
+    if(strcmp(argv[1], "2") == 0){
+        printf("Writing TACs\n");
+        // open file for writing outname.tac
+        char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
+        sprintf(outname_out, "%s.tac", outname);
+        FILE* file_out = fopen(outname_out, "w");
+        if (!file_out) {
+            perror("Error opening file");
+            return 1;
+        }
+        printf("\tWriting TACs -- Activation Record\n");
+        print_activationRecord(file_out, globalST);
+        printf("\tWriting TACs -- Symbol Table\n");
+        print_ST(file_out, globalST);
+        printf("\tWriting TACs -- TAC\n");
+        print_quadArray(file_out, quadArray);
+        printf("TAC DONE\n\n");
+        // close file
+        fclose(file_out);
+        printf("Generating ASM\n");
+        // open file for writing outname.asm
+        char* outname_asm = (char*)malloc(sizeof(char)*strlen(outname)+5);
+        sprintf(outname_asm, "%s.s", outname);
+        FILE* file_asm = fopen(outname_asm, "w");
+        if (!file_asm) {
+            perror("Error opening file");
+            return 1;
+        }
+        tac2x86(file_asm);
+        // close file
+        fclose(file_asm);
+        printf("ASM DONE\n\n\n");
+    }
+    fclose(file);
     return 0;
 }
