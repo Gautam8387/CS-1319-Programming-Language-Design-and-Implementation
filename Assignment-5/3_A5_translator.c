@@ -1128,6 +1128,12 @@ int typecheck(symboltype* type1, symboltype* type2){
             return 1;
         }
     }
+    else if(type1->type == TYPE_ARRAY){
+        return typecheck(type1->ptr, type2);
+    }
+    else if(type2->type == TYPE_ARRAY){
+        return typecheck(type1, type2->ptr);
+    }
     else{
         return 0;
     }

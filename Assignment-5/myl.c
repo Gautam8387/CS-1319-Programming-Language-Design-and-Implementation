@@ -93,7 +93,7 @@ int readInt(int *error) {
     char buffer[1];
     char numStr[100];
     int num = 0, len = 0, i;
-
+    *error = OK;
     if (numStr == NULL) {
         // Handle memory allocation failure
         *error = ERR;

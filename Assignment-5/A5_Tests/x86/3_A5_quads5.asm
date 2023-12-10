@@ -52,7 +52,7 @@ fun:
 	.cfi_offset 5, -8
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 5
-	subq	$52, %rsp
+	subq	$56, %rsp
 	movq	%rdi, -20(%rbp)
 		movl	-20(%rbp), %eax
 	cltd
@@ -70,21 +70,25 @@ fun:
 	movq	-20(%rbp), %rdi
 	call	fun2
 	movl	%eax, -32(%rbp)
-		movl	-32(%rbp), %eax
+	# t5 = *t4
+	movq	-32(%rbp), %rax
+	movl	(%rax), %eax
+	movl	%eax, -36(%rbp)
+		movl	-36(%rbp), %eax
 	jmp .LFE4
 	jmp .L13
 .L12:
 	movl	$1, %eax
-	movl	%eax, -36(%rbp)
-		movl	-20(%rbp), %eax
-	movl	-36(%rbp), %edx
-	addl 	%edx, %eax
 	movl	%eax, -40(%rbp)
-	movl	-40(%rbp), %eax
-	movq	-40(%rbp), %rdi
-	call	fun
+		movl	-20(%rbp), %eax
+	movl	-40(%rbp), %edx
+	addl 	%edx, %eax
 	movl	%eax, -44(%rbp)
-		movl	-44(%rbp), %eax
+	movl	-44(%rbp), %eax
+	movq	-44(%rbp), %rdi
+	call	fun
+	movl	%eax, -48(%rbp)
+		movl	-48(%rbp), %eax
 	jmp .LFE4
 .L13:
 	.LFE4: 
