@@ -20,7 +20,16 @@ int printStr(char *str) {
     return len;
 }
 
-// Function to print an integer to STDOUT
+
+/*
+Function to print an integer
+We go through the following steps:
+1. Allocate dynamic memory for a character array (string) to store the integer
+2. Convert the integer to a character array (string) in reverse order
+3. Reverse the string if it's a negative number
+4. Use the write system call to print the integer string to STDOUT
+5. Free the dynamically allocated memory
+*/
 int printInt(int num) {
     char *buffer;
     int index = 0;
@@ -77,7 +86,15 @@ int printInt(int num) {
     return bytes;
 }
 
-// Function to read an integer from STDIN
+/*
+A function to read an integer from STDIN
+We go through the following steps:
+1. Allocate dynamic memory for a character array (string) to store the integer
+2. Read one character at a time from STDIN to the buffer
+3. Check for invalid characters and set error flag if necessary
+4. Convert the character array (string) to an integer
+5. Free the dynamically allocated memory
+*/
 int readInt(int *error) {
     char buffer[1];
     char *numStr;

@@ -1578,9 +1578,9 @@ int main(int argc, char** argv){
 
     if(strcmp(argv[1], "1") == 0){
         printf("Writing TACs\n");
-        // open file for writing outname.tac
+        // open file for writing outname.out
         char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
-        sprintf(outname_out, "%s.tac", outname);
+        sprintf(outname_out, "%s.out", outname);
         FILE* file_out = fopen(outname_out, "w");
         if (!file_out) {
             perror("Error opening file");
@@ -1599,9 +1599,9 @@ int main(int argc, char** argv){
 
     if(strcmp(argv[1], "2") == 0){
         printf("Writing TACs\n");
-        // open file for writing outname.tac
+        // open file for writing outname.out
         char* outname_out = (char*)malloc(sizeof(char)*strlen(outname)+5);
-        sprintf(outname_out, "%s.tac", outname);
+        sprintf(outname_out, "%s.out", outname);
         FILE* file_out = fopen(outname_out, "w");
         if (!file_out) {
             perror("Error opening file");
