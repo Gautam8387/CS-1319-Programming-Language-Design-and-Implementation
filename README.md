@@ -19,3 +19,6 @@ This assignment is to write a symbol table for nanoC. We also generate the inter
 
 ## Assignment 5
 This assignment is to generate the target code translator from the TAC quad array (with the supporting symbol table, and other auxiliary data structures) to the assembly language of ```x86/IA-32/x86-64```. The translation is now machine-specific and your generated assembly code would be translated with the gcc assembler to produce the final executable codes for the ```nanoC``` program.
+
+## Assignment 6
+A hands on assignment (problem workout) to understand all the phases of a compiler. Starting with ```Symbol Table```, generating ```TAC/Quads```, ```IO Library```, ```Peephole Optimization```, ```CFG```, local ```CSE```, ```Liveness Analysis```, ```Register Allocation``` and ```Code Generation```.
