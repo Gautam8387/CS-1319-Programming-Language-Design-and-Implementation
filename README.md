@@ -22,3 +22,5 @@ This assignment is to generate the target code translator from the TAC quad arra
 
 ## Assignment 6
 A hands on assignment (problem workout) to understand all the phases of a compiler. Starting with ```Symbol Table```, generating ```TAC/Quads```, ```IO Library```, ```Peephole Optimization```, ```CFG```, local ```CSE```, ```Liveness Analysis```, ```Register Allocation``` and ```Code Generation```.
+
+Used ```draw.io``` to draw the CFG and the register allocation graph.
