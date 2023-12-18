@@ -1,25 +1,33 @@
 int printInt(int num);
 int printStr(char * c);
 int readInt(int *eP);
-/* Bubble Sort Algorithm in nanoC language.
-This is a test program for the lexer to tokenize.
-Group 03: julius-stabs-back
-Members: Gautam Ahuja, Nistha Singh
-*/
-int arr[10]; // Sorted array to search
-// A recursive binary search function. It returns location of x
-// in given array arr[l..r] is present, otherwise -1
-int binarySearch(int l, int r, int x) {
-    if (r >= l) {
-        int mid = l + (r - l) / 2;
-        // If the element is present at the middle itself
-        if (arr[mid] == x)
-            return mid;
-        // If element is smaller than mid, then it can only be present in left subarray
-        if (arr[mid] > x)
-            return binarySearch(l, mid - 1, x);
-        // Else the element can only be present in right subarray
-        return binarySearch(mid + 1, r, x);
+
+void swap(int *a, int *b) {
+    int t;
+    t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int kt(int n) {
+    int p; // Previous number
+    int d1; // Largest digit
+    int d2; // Second largest digit
+    int d3; // Smallest digit
+    int m; // Next number
+    p = n; // Remember current number
+    // Extract digits in sorted order
+    d1 = n % 10;
+    n = n / 10;
+    d2 = n % 10;
+    n = n / 10;
+    if (d1 < d2)
+    swap(&d1, &d2);
+    d3 = n % 10;
+    if (d2 < d3) {
+        swap(&d2, &d3);
+        if (d1 < d2)
+            swap(&d1, &d2);
     }
     // We reach here when element is not present in array
     return -1;
